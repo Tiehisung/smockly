@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 export function ProfilePicture() {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+//   const [progress, setProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     user?.photoURL || null,
   );
@@ -109,14 +109,14 @@ export function ProfilePicture() {
         />
       </div>
 
-      {progress > 0 && progress < 100 && (
+      {/* {progress > 0 && progress < 100 && (
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }
