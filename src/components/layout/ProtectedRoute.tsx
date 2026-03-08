@@ -3,9 +3,13 @@ import { useAuth } from "../../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   redirectTo?: string;
+  requireVerified?: boolean;
 }
 
-export function ProtectedRoute({ redirectTo = "/auth/login" }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  redirectTo = "/auth/login",
+  requireVerified,
+}: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
   // Show loading while checking auth
@@ -20,6 +24,10 @@ export function ProtectedRoute({ redirectTo = "/auth/login" }: ProtectedRoutePro
   // Redirect if not logged in
   if (!user) {
     return <Navigate to={redirectTo} replace />;
+  }
+  // Redirect to verification page if email not verified
+  if (requireVerified && !user.emailVerified) {
+    return <Navigate to="/auth/verify-email" replace />;
   }
 
   // Render child routes if logged in

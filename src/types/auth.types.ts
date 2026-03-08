@@ -1,6 +1,7 @@
 import type { User as FirebaseUser } from "firebase/auth";
 
 export interface AuthUser {
+
     uid: string;
     email: string | null;
     displayName: string | null;
@@ -25,6 +26,7 @@ export interface AuthContextType {
     signUp: (data: SignUpData) => Promise<void>;
     signIn: (data: SignInData) => Promise<void>;
     logout: () => Promise<void>;
+    reload?: () => Promise<void>
 }
 
 // Convert Firebase user to our AuthUser type
@@ -32,10 +34,11 @@ export const mapFirebaseUser = (user: FirebaseUser | null): AuthUser | null => {
     if (!user) return null;
 
     return {
+        ...user,
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
+        emailVerified: user.emailVerified
     };
 };

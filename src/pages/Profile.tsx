@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setUserPreferences } from "../store/slices/userSlice";
+import { ProfilePicture } from "../components/ProfilePicture";
 
 export function Profile() {
   const { user } = useAuth();
@@ -30,6 +31,7 @@ export function Profile() {
         {/* Profile Info */}
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
+          <ProfilePicture />
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

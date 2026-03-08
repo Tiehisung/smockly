@@ -10,6 +10,8 @@ import { About } from "../pages/About";
 import { NotFound } from "../pages/NotFound";
 import { LoginPage } from "../pages/auth/Login";
 import { SignupPage } from "../pages/auth/Signup";
+import { VerifyEmail } from "../pages/auth/VerifyEmail";
+import { ForgotPassword } from "../pages/auth/ForgotPassword";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +39,11 @@ export const router = createBrowserRouter([
             path: "signup",
             element: <SignupPage />,
           },
+          
+          {
+            path: "forgot-password",
+            element: <ForgotPassword />,
+          },
         ],
       },
 
@@ -57,6 +64,10 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Profile />,
+          },
+          {
+            path: "verify-email",
+            element: <VerifyEmail />,
           },
         ],
       },

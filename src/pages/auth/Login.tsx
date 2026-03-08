@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
- 
+
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../configs/firebase";
 import { useAuth } from "../../contexts/AuthContext";
- 
+import { SocialLogin } from "../../components/auth/SocialLogin";
+import TextDivider from "../../components/Divider";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { loading:initialLoading } = useAuth();
+  const { loading: initialLoading } = useAuth();
 
   if (initialLoading) {
     return (
@@ -93,6 +94,13 @@ export function LoginPage() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
+
+          <TextDivider />
+          
+          <SocialLogin
+            onError={(error) => setError(error)}
+            onSuccess={() => console.log("Login successful")}
+          />
 
           <div className="text-center">
             <Link
