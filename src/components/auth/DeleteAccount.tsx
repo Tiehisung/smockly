@@ -7,6 +7,7 @@ export function DeleteAccount() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
+  console.log(showConfirm)
   const [confirmation, setConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
