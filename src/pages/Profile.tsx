@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setUserPreferences } from "../store/slices/userSlice";
 import { ProfilePicture } from "../components/ProfilePicture";
+import { DeleteAccount } from "../components/auth/DeleteAccount";
 
 export function Profile() {
   const { user } = useAuth();
@@ -126,6 +127,10 @@ export function Profile() {
             Save Changes
           </button>
         </div>
+      </div>
+
+      <div className="my-8">
+        <DeleteAccount />
       </div>
     </div>
   );

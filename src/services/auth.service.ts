@@ -14,6 +14,7 @@ import {
 
 import { type SignUpData, type SignInData, type AuthUser, mapFirebaseUser } from "../types/auth.types";
 import { auth } from "../configs/firebase";
+import { apiService } from "./api.service";
 
 class AuthService {
     /** Google Sign In */
@@ -81,6 +82,8 @@ class AuthService {
             const mappedUser = mapFirebaseUser(userCredential.user);
             if (!mappedUser) throw new Error('Failed to create user');
 
+            // Call backend to save user to MongoDB
+            await this.saveUserToDatabase(mappedUser);
             return mappedUser;
         } catch (error: any) {
             throw new Error(error.message);
@@ -98,6 +101,9 @@ class AuthService {
             const mappedUser = mapFirebaseUser(userCredential.user);
             if (!mappedUser) throw new Error('Failed to sign in');
 
+            // Update last login in database
+            await this.updateUserLastLogin(mappedUser.uid);
+
             return mappedUser;
         } catch (error: any) {
             throw new Error(error.message);
@@ -110,6 +116,38 @@ class AuthService {
 
     getCurrentUser(): AuthUser | null {
         return mapFirebaseUser(auth.currentUser);
+    }
+
+    // Save user to MongoDB
+     async saveUserToDatabase(user: AuthUser): Promise<void> {
+        try {
+            console.log('saving')
+            const response = await apiService.post('/users/create', {
+                firebaseUid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL
+            });
+
+            if (!response.success) {
+                console.error('Failed to save user to database:', response.error);
+            } else {
+                console.log('✅ User saved to MongoDB');
+            }
+        } catch (error) {
+            console.error('Error saving user to database:', error);
+            // Don't throw - we don't want to block the user if DB save fails
+            // They'll be created when they first access their profile
+        }
+    }
+
+    // Update last login
+     async updateUserLastLogin(uid: string): Promise<void> {
+        try {
+            await apiService.post('/users/last-login', { uid });
+        } catch (error) {
+            console.error('Error updating last login:', error);
+        }
     }
 }
 
