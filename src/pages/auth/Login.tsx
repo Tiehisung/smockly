@@ -5,7 +5,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../configs/firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { SocialLogin } from "../../components/auth/SocialLogin";
-import TextDivider from "../../components/Divider";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -52,7 +51,7 @@ export function LoginPage() {
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-md space-y-4">
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -94,23 +93,18 @@ export function LoginPage() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
-
-          <TextDivider />
-          
-          <SocialLogin
-            onError={(error) => setError(error)}
-            onSuccess={() => console.log("Login successful")}
-          />
-
-          <div className="text-center">
-            <Link
-              to="/auth/signup"
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              Don't have an account? Sign up
-            </Link>
-          </div>
         </form>
+
+        <SocialLogin onError={(error) => setError(error)} />
+
+        <div className="text-center">
+          <Link
+            to="/auth/signup"
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Don't have an account? Sign up
+          </Link>
+        </div>
       </div>
     </div>
   );

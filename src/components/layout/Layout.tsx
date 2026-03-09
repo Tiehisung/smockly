@@ -33,7 +33,6 @@ export function Layout() {
                 >
                   Home
                 </Link>
-
                 <Link
                   to="/dashboard"
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
@@ -44,7 +43,29 @@ export function Layout() {
                 >
                   Dashboard
                 </Link>
-
+                <Link
+                  to="/users"
+                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
+                    location.pathname === "/about"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Users
+                </Link>
+                {/* Add this in your navigation links */}
+                {/* {user?.role === "admin" && (
+                  <Link
+                    to="/users"
+                    className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
+                      location.pathname.startsWith("/users")
+                        ? "text-blue-600 border-b-2 border-blue-600"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Users
+                  </Link>
+                )} */}
                 <Link
                   to="/about"
                   className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
@@ -97,7 +118,10 @@ export function Layout() {
       <main className="max-w-7xl mx-auto py-6 px-4">
         <Outlet /> {/* This is where page content will render */}
         {user && (
-          <button className="text-red-600 my-5 border px-1 cursor-pointer" onClick={logout}>
+          <button
+            className="text-red-600 my-5 border px-1 cursor-pointer"
+            onClick={logout}
+          >
             Logout
           </button>
         )}

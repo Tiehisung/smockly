@@ -1,8 +1,12 @@
 import { auth } from "../configs/firebase";
 
+
+
 interface ApiResponse<T> {
+    success: boolean;
     data?: T;
     error?: string;
+    errors?: any[];
 }
 
 class ApiService {
@@ -26,19 +30,33 @@ class ApiService {
         return headers;
     }
 
+    private handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
+        const data = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                error: data.error || 'Request failed',
+                errors: data.errors
+            };
+        }
+
+        return {
+            success: true,
+            data: data.data
+        };
+    };
+
     async get<T>(endpoint: string): Promise<ApiResponse<T>> {
         try {
             const headers = await this.getHeaders();
             const response = await fetch(`${this.baseURL}${endpoint}`, { headers });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
+            return this.handleResponse<T>(response);
         } catch (error: any) {
-            return { error: error.message };
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 
@@ -50,15 +68,46 @@ class ApiService {
                 headers,
                 body: JSON.stringify(body),
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
+            return this.handleResponse<T>(response);
         } catch (error: any) {
-            return { error: error.message };
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async put<T, D = any>(endpoint: string, body: D): Promise<ApiResponse<T>> {
+        try {
+            const headers = await this.getHeaders();
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify(body),
+            });
+            return this.handleResponse<T>(response);
+        } catch (error: any) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    async delete<T>(endpoint: string, body: any): Promise<ApiResponse<T>> {
+        try {
+            const headers = await this.getHeaders();
+            const response = await fetch(`${this.baseURL}${endpoint}`, {
+                method: 'DELETE',
+                headers, 
+                body: JSON.stringify(body),
+            });
+            return this.handleResponse<T>(response);
+        } catch (error: any) {
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 }

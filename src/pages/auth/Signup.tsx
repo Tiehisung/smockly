@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../configs/firebase";
- 
+import { authService } from "../../services/auth.service";
 
 export function SignupPage() {
   const [email, setEmail] = useState("");
@@ -27,7 +25,10 @@ export function SignupPage() {
     setError("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await authService.signUp({
+        email,
+        password,
+      });
       navigate("/dashboard");
     } catch (error: any) {
       setError(error.message);
@@ -44,13 +45,13 @@ export function SignupPage() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 border border-gray-200 p-4" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="rounded-md space-y-4">
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address

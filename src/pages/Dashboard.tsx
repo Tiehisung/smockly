@@ -1,5 +1,6 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useAppSelector } from "../store/hooks";
+ 
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -68,6 +69,8 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+ 
     </div>
   );
 }

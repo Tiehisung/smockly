@@ -1,19 +1,21 @@
-const TextDivider = ({
-  text = 'OR',
-  className = ' mt-4 mb-6',
-  border='border-border',
+import type { ReactNode } from "react";
+
+const Divider = ({
+  content = "OR",
+  className = " mt-4 mb-6",
+  borderClassName = "border-border",
 }: {
-  text?: string;
+  content?: ReactNode;
   className?: string;
-  border?: string;
+  borderClassName?: string;
 }) => {
   return (
     <div className={`flex items-center select-none ${className}`}>
-      <hr className={`grow border-t  ${border}`} />
-      <span className="px-4 _p">{text}</span>
-      <hr className={`grow border-t ${border}`} />
+      <hr className={`grow border-t  ${borderClassName}`} />
+      <span className="px-4 _p">{content}</span>
+      <hr className={`grow border-t ${borderClassName}`} />
     </div>
   );
 };
 
-export default TextDivider;
+export default Divider;
