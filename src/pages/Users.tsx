@@ -8,7 +8,7 @@ import {
   useUpdateUserRoleMutation,
   useToggleUserStatusMutation,
   useAdminDeleteUserMutation,
-} from "../services/user.api";
+} from "../store/api/user.api";
 import { EUserRole } from "../types/user.types";
 import { enumToOptions } from "../lib/select";
 
