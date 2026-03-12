@@ -1,6 +1,6 @@
-import type { IUser } from '../types/user.types';
-import type { IApiResponse, IQueryParams } from '../types';
-import { baseApi } from './base-api';
+import type { IUser } from '../../types/user.types';
+import type { IApiResponse, IQueryParams } from '../../types';
+import { baseApi } from './baseApi';
 
 // Types
 
