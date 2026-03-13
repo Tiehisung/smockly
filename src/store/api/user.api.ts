@@ -1,6 +1,7 @@
 import type { IUser } from '../../types/user.types';
 import type { IApiResponse, IQueryParams } from '../../types';
 import { baseApi } from './baseApi';
+import type { IAddress } from '../../types/shop.types';
 
 // Types
 
@@ -75,6 +76,65 @@ export const userApi = baseApi.injectEndpoints({
             transformResponse: (response: UserResponse) => response.data,
         }),
 
+        // Stats
+        getUserStats: builder.query<any, void>({
+            query: () => '/users/stats',
+            providesTags: ['UserStats']
+        }),
+
+        // Addresses
+        getAddresses: builder.query<IAddress[], void>({
+            query: () => '/users/addresses',
+            providesTags: ['Addresses']
+        }),
+
+        addAddress: builder.mutation<IAddress[], IAddress>({
+            query: (address) => ({
+                url: '/users/addresses',
+                method: 'POST',
+                body: address
+            }),
+            invalidatesTags: ['Addresses']
+        }),
+
+        updateAddress: builder.mutation<IAddress[], { addressId: string; data: Partial<IAddress> }>({
+            query: ({ addressId, data }) => ({
+                url: `/users/addresses/${addressId}`,
+                method: 'PUT',
+                body: data
+            }),
+            invalidatesTags: ['Addresses']
+        }),
+        deleteAddress: builder.mutation<IAddress[], string>({
+            query: (addressId) => ({
+                url: `/users/addresses/${addressId}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['Addresses']
+        }),
+
+        // Wishlist
+        getWishlist: builder.query<any[], void>({
+            query: () => '/users/wishlist',
+            providesTags: ['Wishlist']
+        }),
+
+        addToWishlist: builder.mutation<void, string>({
+            query: (productId) => ({
+                url: `/users/wishlist/${productId}`,
+                method: 'POST'
+            }),
+            invalidatesTags: ['Wishlist']
+        }),
+
+        removeFromWishlist: builder.mutation<void, string>({
+            query: (productId) => ({
+                url: `/users/wishlist/${productId}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['Wishlist']
+        }),
+
         // Delete own account
         deleteOwnAccount: builder.mutation<IApiResponse, { confirmation: string }>({
             query: ({ confirmation }) => ({
@@ -135,7 +195,14 @@ export const userApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: { uid },
             }),
-        }),
+        }), // Delete account
+        deleteAccount: builder.mutation<void, { confirmation: string }>({
+            query: (data) => ({
+                url: '/users/account',
+                method: 'DELETE',
+                body: data
+            })
+        })
     }),
 })
 
@@ -152,4 +219,13 @@ export const {
     useToggleUserStatusMutation,
     useAdminDeleteUserMutation,
     useUpdateLastLoginMutation,
+    useGetAddressesQuery,
+    useAddAddressMutation,
+    useUpdateAddressMutation,
+    useDeleteAddressMutation,
+    useGetWishlistQuery,
+    useAddToWishlistMutation,
+    useRemoveFromWishlistMutation,
+    useGetUserStatsQuery,
+    useDeleteAccountMutation
 } = userApi;

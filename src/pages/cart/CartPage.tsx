@@ -34,13 +34,6 @@ export function CartPage() {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
 
@@ -273,13 +266,17 @@ export function CartPage() {
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-bold text-gray-900">
-                          {formatCurrency(Number(item.price) * item.quantity)}
+                          {formatPrice({
+                            ...item.price,
+                            amount: item.price.amount * item.quantity,
+                          })}
                         </div>
                         {item.originalPrice && (
                           <div className="text-sm text-gray-500 line-through">
-                            {formatCurrency(
-                              Number(item.originalPrice) * item.quantity,
-                            )}
+                            {formatPrice({
+                              ...item.price,
+                              amount: item.originalPrice.amount * item.quantity,
+                            })}
                           </div>
                         )}
                       </div>

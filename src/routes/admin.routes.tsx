@@ -2,9 +2,10 @@
 import type { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { AdminLayout } from "../pages/admin/AdminLayout";
-import { EUserRole } from "../types/user.types";
+// import { EUserRole } from "../types/user.types";
+import { AdminProducts } from "../pages/admin/products/ProductsPage";
+import { AdminProductForm } from "../pages/admin/products/ProductForm";
 // import { AdminDashboard } from "../pages/admin/AdminDashboard";
-// import { AdminProducts } from "../pages/admin/AdminProducts";
 // import { AdminProductForm } from "../pages/admin/AdminProductForm";
 // import { AdminOrders } from "../pages/admin/AdminOrders";
 // import { AdminOrderDetails } from "../pages/admin/AdminOrderDetails";
@@ -18,73 +19,77 @@ import { EUserRole } from "../types/user.types";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
-  element: <ProtectedRoute requiredRole={EUserRole.ADMIN} />,
+  element: (
+    <ProtectedRoute
+    // requiredRole={EUserRole.ADMIN}
+    />
+  ),
   children: [
     {
       element: <AdminLayout />,
       children: [
-    //     {
-    //       index: true,
-    //       element: <AdminDashboard />,
-    //     },
-    //     {
-    //       path: "products",
-    //       children: [
-    //         {
-    //           index: true,
-    //           element: <AdminProducts />,
-    //         },
-    //         {
-    //           path: "new",
-    //           element: <AdminProductForm />,
-    //         },
-    //         {
-    //           path: "edit/:productId",
-    //           element: <AdminProductForm />,
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       path: "orders",
-    //       children: [
-    //         {
-    //           index: true,
-    //           element: <AdminOrders />,
-    //         },
-    //         {
-    //           path: ":orderId",
-    //           element: <AdminOrderDetails />,
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       path: "customers",
-    //       element: <AdminCustomers />,
-    //     },
-    //     {
-    //       path: "users",
-    //       element: <AdminUsers />,
-    //     },
-    //     {
-    //       path: "categories",
-    //       element: <AdminCategories />,
-    //     },
-    //     {
-    //       path: "coupons",
-    //       element: <AdminCoupons />,
-    //     },
-    //     {
-    //       path: "inventory",
-    //       element: <AdminInventory />,
-    //     },
-    //     {
-    //       path: "reports",
-    //       element: <AdminReports />,
-    //     },
-    //     {
-    //       path: "settings",
-    //       element: <AdminSettings />,
-    //     },
+        //     {
+        //       index: true,
+        //       element: <AdminDashboard />,
+        //     },
+        {
+          path: "products",
+          children: [
+            {
+              index: true,
+              element: <AdminProducts />,
+            },
+            {
+              path: "new",
+              element: <AdminProductForm />,
+            },
+            {
+              path: "edit/:productId",
+              element: <AdminProductForm />,
+            },
+          ],
+        },
+        //     {
+        //       path: "orders",
+        //       children: [
+        //         {
+        //           index: true,
+        //           element: <AdminOrders />,
+        //         },
+        //         {
+        //           path: ":orderId",
+        //           element: <AdminOrderDetails />,
+        //         },
+        //       ],
+        //     },
+        //     {
+        //       path: "customers",
+        //       element: <AdminCustomers />,
+        //     },
+        //     {
+        //       path: "users",
+        //       element: <AdminUsers />,
+        //     },
+        //     {
+        //       path: "categories",
+        //       element: <AdminCategories />,
+        //     },
+        //     {
+        //       path: "coupons",
+        //       element: <AdminCoupons />,
+        //     },
+        //     {
+        //       path: "inventory",
+        //       element: <AdminInventory />,
+        //     },
+        //     {
+        //       path: "reports",
+        //       element: <AdminReports />,
+        //     },
+        //     {
+        //       path: "settings",
+        //       element: <AdminSettings />,
+        //     },
       ],
     },
   ],

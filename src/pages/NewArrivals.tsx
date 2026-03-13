@@ -5,10 +5,10 @@ import { ProductCard } from "../components/products/ProductCard";
 import { ProductSort } from "../components/products/ProductSort";
 import { Pagination } from "../components/ui/Pagination";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
-
 import { SparklesIcon } from "@heroicons/react/24/outline";
-import { getNewArrivals } from "../data/shop";
+import type { IPagination } from "../types";
 import { allCategories } from "../data/categories";
+import { getNewArrivals } from "../data/shop";
 
 export function NewArrivals() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,10 +19,20 @@ export function NewArrivals() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<string>("all");
 
-  // Pagination
+  // Pagination state
   const page = Number(searchParams.get("page")) || 1;
   const sortBy = searchParams.get("sort") || "newest";
   const itemsPerPage = 12;
+
+  // Pagination info
+  const [paginationInfo, setPaginationInfo] = useState<Partial<IPagination>>({
+    page: 1,
+    pages: 1,
+    total: 0,
+    limit: itemsPerPage,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
   // Time filter options
   const timeFilters = [
@@ -79,12 +89,24 @@ export function NewArrivals() {
     setFilteredProducts(filtered);
   }, [selectedCategory, sortBy, newArrivals]);
 
-  // Update displayed products based on page
+  // Update pagination and displayed products
   useEffect(() => {
+    const total = filteredProducts.length;
+    const pages = Math.ceil(total / itemsPerPage);
     const start = (page - 1) * itemsPerPage;
     const end = start + itemsPerPage;
+
+    setPaginationInfo({
+      page,
+      pages,
+      total,
+      limit: itemsPerPage,
+      hasNextPage: page < pages,
+      hasPreviousPage: page > 1,
+    });
+
     setDisplayedProducts(filteredProducts.slice(start, end));
-  }, [filteredProducts, page]);
+  }, [filteredProducts, page, itemsPerPage]);
 
   const sortProducts = (products: any[], sortType: string) => {
     switch (sortType) {
@@ -110,8 +132,6 @@ export function NewArrivals() {
     params.set("page", newPage.toString());
     setSearchParams(params);
   };
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className="bg-white">
@@ -199,8 +219,8 @@ export function NewArrivals() {
             <p className="text-sm text-gray-500">
               Showing{" "}
               <span className="font-medium">{displayedProducts.length}</span> of{" "}
-              <span className="font-medium">{filteredProducts.length}</span> new
-              arrivals
+              <span className="font-medium">{paginationInfo.total || 0}</span>{" "}
+              new arrivals
             </p>
             {timeFilter !== "all" && (
               <p className="text-xs text-gray-400 mt-1">
@@ -263,10 +283,10 @@ export function NewArrivals() {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {paginationInfo.pages && paginationInfo.pages > 1 && (
               <Pagination
-                pagination={{ page, pages: totalPages }}
                 onPageChange={handlePageChange}
+                pagination={paginationInfo}
               />
             )}
           </>

@@ -3,22 +3,17 @@
 import { baseApi } from "./baseApi";
 import type { ICategory } from "../../types/category.types";
 import { TAG_TYPES } from "./tags";
+import type { IApiResponse } from "../../types";
 
 export const categoriesApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get all categories
-        getCategories: builder.query<ICategory[], { featured?: boolean; parent?: string }>({
+        getCategories: builder.query<IApiResponse<ICategory[]>, { featured?: boolean; parent?: string }>({
             query: (params) => ({
                 url: '/categories',
                 params,
             }),
-            providesTags: (result) =>
-                result
-                    ? [
-                        ...result.map(({ _id }) => ({ type: TAG_TYPES.CATEGORIES, id: _id })),
-                        { type: TAG_TYPES.CATEGORIES, id: 'LIST' },
-                    ]
-                    : [{ type: TAG_TYPES.CATEGORIES, id: 'LIST' }],
+            providesTags: [TAG_TYPES.CATEGORIES],
         }),
 
         // Get category by slug

@@ -36,7 +36,7 @@ export function AdminLayout() {
       >
         {/* Overlay */}
         <div
-          className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ${
+          className={`fixed inset-0 bg-gray-600/75 transition-opacity ${
             sidebarOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setSidebarOpen(false)}

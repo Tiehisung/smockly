@@ -93,4 +93,6 @@ export const {
     useClearWishlistMutation,
     useMoveToCartMutation,
     useCheckInWishlistQuery,
+    useLazyGetWishlistQuery,
+    useLazyCheckInWishlistQuery
 } = wishlistApi;

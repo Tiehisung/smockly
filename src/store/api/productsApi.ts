@@ -5,7 +5,7 @@ import type { IPaginatedResponse } from "../../types";
 import type { IProduct, IProductFilters } from "../../types/product.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
- 
+
 export const productsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get all products with filters
@@ -122,85 +122,13 @@ export const productsApi = baseApi.injectEndpoints({
             }),
         }),
 
-        // Admin: Create product
-        createProduct: builder.mutation<IProduct, FormData>({
-            query: (productData) => ({
-                url: '/admin/products',
-                method: 'POST',
-                body: productData,
-            }),
-            invalidatesTags: [
-                { type: TAG_TYPES.PRODUCTS, id: 'LIST' },
-                TAG_TYPES.FEATURED,
-                TAG_TYPES.BESTSELLERS,
-                TAG_TYPES.NEW,
-            ],
-        }),
 
-        // Admin: Update product
-        updateProduct: builder.mutation<IProduct, { id: string; data: FormData }>({
-            query: ({ id, data }) => ({
-                url: `/admin/products/${id}`,
-                method: 'PUT',
-                body: data,
-            }),
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: TAG_TYPES.PRODUCT, id },
-                { type: TAG_TYPES.PRODUCTS, id: 'LIST' },
-                TAG_TYPES.FEATURED,
-                TAG_TYPES.BESTSELLERS,
-                TAG_TYPES.NEW,
-            ],
-        }),
 
-        // Admin: Delete product
-        deleteProduct: builder.mutation<{ message: string }, string>({
-            query: (id) => ({
-                url: `/admin/products/${id}`,
-                method: 'DELETE',
-            }),
-            invalidatesTags: [
-                { type: TAG_TYPES.PRODUCTS, id: 'LIST' },
-                TAG_TYPES.FEATURED,
-                TAG_TYPES.BESTSELLERS,
-                TAG_TYPES.NEW,
-            ],
-        }),
 
-        // Admin: Update inventory
-        updateInventory: builder.mutation<
-            IProduct,
-            { productId: string; variantId?: string; quantity: number }
-        >({
-            query: (data) => ({
-                url: '/admin/products/update-inventory',
-                method: 'PATCH',
-                body: data,
-            }),
-            invalidatesTags: (_result, _error, { productId }) => [
-                { type: TAG_TYPES.PRODUCT, id: productId },
-                { type: TAG_TYPES.PRODUCTS, id: 'LIST' },
-            ],
-        }),
 
-        // Admin: Bulk update products
-        bulkUpdateProducts: builder.mutation<{ count: number }, { ids: string[]; data: any }>({
-            query: (data) => ({
-                url: '/admin/products/bulk',
-                method: 'PATCH',
-                body: data,
-            }),
-            invalidatesTags: [{ type: TAG_TYPES.PRODUCTS, id: 'LIST' }],
-        }),
 
-        // Admin: Duplicate product
-        duplicateProduct: builder.mutation<IProduct, string>({
-            query: (id) => ({
-                url: `/admin/products/${id}/duplicate`,
-                method: 'POST',
-            }),
-            invalidatesTags: [{ type: TAG_TYPES.PRODUCTS, id: 'LIST' }],
-        }),
+
+
     }),
 });
 
@@ -219,11 +147,5 @@ export const {
     useLazyGetProductsQuery,
     useLazySearchProductsQuery,
 
-    // Mutations
-    useCreateProductMutation,
-    useUpdateProductMutation,
-    useDeleteProductMutation,
-    useUpdateInventoryMutation,
-    useBulkUpdateProductsMutation,
-    useDuplicateProductMutation,
+
 } = productsApi;

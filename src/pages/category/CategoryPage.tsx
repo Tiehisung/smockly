@@ -9,8 +9,10 @@ import { useGetCategoryBySlugQuery } from "../../store/api/categoriesApi";
 import { useGetProductsByCategoryQuery } from "../../store/api/productsApi";
 import { allCategories } from "../../data/categories";
 import { allProducts } from "../../data/products";
+import useScrollToTop from "../../hooks/useScrollToTop";
 
 export function CategoryPage() {
+  
   const { categorySlug } = useParams<{ categorySlug: string }>();
   const [page, setPage] = useState(1);
 
@@ -54,7 +56,7 @@ export function CategoryPage() {
   //     </div>
   //   );
   // }
-
+useScrollToTop();
   return (
     <div className="bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -90,12 +92,13 @@ export function CategoryPage() {
               ))}
             </div>
 
-            {normalProducts?.pagination && normalProducts.pagination.pages > 1 && (
-              <Pagination
-                pagination={normalProducts.pagination}
-                onPageChange={setPage}
-              />
-            )}
+            {normalProducts?.pagination &&
+              normalProducts.pagination.pages > 1 && (
+                <Pagination
+                  pagination={normalProducts.pagination}
+                  onPageChange={setPage}
+                />
+              )}
           </>
         )}
       </div>

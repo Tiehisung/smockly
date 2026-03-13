@@ -4,6 +4,9 @@ import {
   useGetWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
+  useClearWishlistMutation,
+  useMoveToCartMutation,
+  useLazyCheckInWishlistQuery,
 } from "../store/api/wishlistApi";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,24 +20,43 @@ export const useWishlist = () => {
     data: wishlist = [],
     isLoading,
     refetch,
+    error,
   } = useGetWishlistQuery(undefined, {
     skip: !user, // Skip if not logged in
   });
 
   const [addToWishlistMutation] = useAddToWishlistMutation();
   const [removeFromWishlistMutation] = useRemoveFromWishlistMutation();
+  const [clearWishlistMutation] = useClearWishlistMutation();
+  const [moveToCartMutation] = useMoveToCartMutation();
+  const [checkInWishlist] = useLazyCheckInWishlistQuery();
 
   const isInWishlist = useCallback(
-    (productId: string) => {
+    async (productId: string): Promise<boolean> => {
+      if (!user) return false;
+      try {
+        const result = await checkInWishlist(productId).unwrap();
+        return result;
+      } catch (error) {
+        return false;
+      }
+    },
+    [user, checkInWishlist],
+  );
+
+  // Sync version for components that need immediate value
+  const isInWishlistSync = useCallback(
+    (productId: string): boolean => {
+      if (!user) return false;
       return wishlist.some((item) => item._id === productId);
     },
-    [wishlist],
+    [user, wishlist],
   );
 
   const addToWishlist = useCallback(
     async (productId: string) => {
       if (!user) {
-        navigate("/login");
+        navigate("/auth/login", { state: { from: window.location.pathname } });
         toast.error("Please login to add items to wishlist");
         return;
       }
@@ -42,8 +64,12 @@ export const useWishlist = () => {
       try {
         await addToWishlistMutation(productId).unwrap();
         toast.success("Added to wishlist");
-      } catch (error) {
-        toast.error("Failed to add to wishlist");
+      } catch (error: any) {
+        if (error?.data?.message?.includes("already")) {
+          toast.error("Item already in wishlist");
+        } else {
+          toast.error("Failed to add to wishlist");
+        }
       }
     },
     [user, navigate, addToWishlistMutation],
@@ -51,6 +77,8 @@ export const useWishlist = () => {
 
   const removeFromWishlist = useCallback(
     async (productId: string) => {
+      if (!user) return;
+
       try {
         await removeFromWishlistMutation(productId).unwrap();
         toast.success("Removed from wishlist");
@@ -58,28 +86,74 @@ export const useWishlist = () => {
         toast.error("Failed to remove from wishlist");
       }
     },
-    [removeFromWishlistMutation],
+    [user, removeFromWishlistMutation],
   );
 
   const toggleWishlist = useCallback(
     async (productId: string) => {
-      if (isInWishlist(productId)) {
+      if (!user) {
+        navigate("/auth/login", { state: { from: window.location.pathname } });
+        toast.error("Please login to manage wishlist");
+        return;
+      }
+
+      const isInList = isInWishlistSync(productId);
+
+      if (isInList) {
         await removeFromWishlist(productId);
       } else {
         await addToWishlist(productId);
       }
     },
-    [isInWishlist, addToWishlist, removeFromWishlist],
+    [user, navigate, isInWishlistSync, addToWishlist, removeFromWishlist],
+  );
+
+  const clearWishlist = useCallback(async () => {
+    if (!user) return;
+
+    if (window.confirm("Are you sure you want to clear your wishlist?")) {
+      try {
+        await clearWishlistMutation().unwrap();
+        toast.success("Wishlist cleared");
+      } catch (error) {
+        toast.error("Failed to clear wishlist");
+      }
+    }
+  }, [user, clearWishlistMutation]);
+
+  const moveToCart = useCallback(
+    async (productId: string) => {
+      if (!user) return;
+
+      try {
+        await moveToCartMutation(productId).unwrap();
+        toast.success("Moved to cart");
+      } catch (error) {
+        toast.error("Failed to move to cart");
+      }
+    },
+    [user, moveToCartMutation],
   );
 
   return {
+    // Data
     wishlist,
     isLoading,
-    isInWishlist,
+    error,
+    itemCount: wishlist.length,
+
+    // Sync check (immediate, uses cached data)
+    isInWishlist: isInWishlistSync,
+
+    // Async check (makes API call)
+    checkInWishlist: isInWishlist,
+
+    // Actions
     addToWishlist,
     removeFromWishlist,
     toggleWishlist,
+    clearWishlist,
+    moveToCart,
     refetch,
-    itemCount: wishlist.length,
   };
 };

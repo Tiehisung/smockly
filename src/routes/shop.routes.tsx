@@ -1,14 +1,15 @@
 // src/routes/shop.routes.ts
 import type { RouteObject } from "react-router-dom";
 import { ShopPage } from "../pages/shop/Shop";
-import { ProductDetailsPage } from "../pages/product/ProductDetailsPage";
 import { CategoryPage } from "../pages/category/CategoryPage";
 import { SearchResults } from "../pages/product/Search";
 import { CartPage } from "../pages/cart/CartPage";
 import { CategoriesPage } from "../pages/category/Categories";
 import { NewArrivals } from "../pages/NewArrivals";
+import { Bestsellers } from "../pages/BestSellers";
+import { ProductDetails } from "../pages/product/Details";
+import { AccountWishlist } from "../pages/account/Wishlist";
  
-
 export const shopRoutes: RouteObject[] = [
   {
     path: "shop",
@@ -19,8 +20,13 @@ export const shopRoutes: RouteObject[] = [
     element: <NewArrivals />,
   },
   {
+    path: "best-sellers",
+    element: <Bestsellers />,
+  },
+  
+  {
     path: "product/:slug",
-    element: <ProductDetailsPage />,
+    element: <ProductDetails />,
   },
   {
     path: "categories",
@@ -37,5 +43,9 @@ export const shopRoutes: RouteObject[] = [
   {
     path: "cart",
     element: <CartPage />,
+  },
+  {
+    path: "wishlist",
+    element: <AccountWishlist />,
   },
 ];

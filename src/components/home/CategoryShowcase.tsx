@@ -29,7 +29,7 @@ export function CategoryShowcase() {
     );
   }
 
-  const displayCategories = categories?.slice(0, 4) || [
+  const displayCategories = categories?.data?.slice(0, 4) || [
     { _id: "1", name: "Smocks", slug: "smocks" },
     { _id: "2", name: "Accessories", slug: "accessories" },
     { _id: "3", name: "Bundles", slug: "bundles" },

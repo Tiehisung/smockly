@@ -12,6 +12,7 @@ import { ProductSort } from "../../components/products/ProductSort";
 import { Pagination } from "../../components/ui/Pagination";
 import { allCategories } from "../../data/categories";
 import { allProducts } from "../../data/products";
+import useScrollToTop from "../../hooks/useScrollToTop";
 
 export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,6 +60,8 @@ export function ShopPage() {
       pages: 3,
     },
   };
+
+  useScrollToTop()
 
   // if (error) return <div>Error loading products</div>;
 

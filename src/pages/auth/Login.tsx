@@ -29,7 +29,7 @@ export function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (error: any) {
       setError(error.message);
     } finally {

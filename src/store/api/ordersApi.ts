@@ -2,11 +2,36 @@
 
 import type { IPaginatedResponse } from "../../types";
 import type { ICreateOrderPayload, IOrder } from "../../types/order.types";
+import type { IProcessPaymentResponse, IPaymentVerificationPayload, IPaystackInitializeResponse, IPaystackInitializePayload, IPaystackVerificationResponse } from "../../types/payment.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
- 
+
 export const ordersApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({
+    endpoints: (builder) => ({  
+        // Process payment after Paystack redirect
+        processPayment: builder.mutation<IProcessPaymentResponse, IPaymentVerificationPayload>({
+            query: (paymentData) => ({
+                url: '/orders/process-payment',
+                method: 'POST',
+                body: paymentData,
+            }),
+            invalidatesTags: [TAG_TYPES.ORDERS, TAG_TYPES.ORDER],
+        }),
+
+        // Initialize Paystack payment (server-side)
+        initializePaystackPayment: builder.mutation<IPaystackInitializeResponse, IPaystackInitializePayload>({
+            query: (data) => ({
+                url: '/payments/paystack/initialize',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+        // Verify Paystack payment
+        verifyPaystackPayment: builder.query<IPaystackVerificationResponse, string>({
+            query: (reference) => `/payments/paystack/verify?reference=${reference}`,
+        }),
+
         // Get user orders
         getUserOrders: builder.query<
             IPaginatedResponse<IOrder>['data'],
@@ -163,7 +188,10 @@ export const ordersApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
+export const { useProcessPaymentMutation,
+    useInitializePaystackPaymentMutation,
+    useVerifyPaystackPaymentQuery,
+    useLazyVerifyPaystackPaymentQuery,
     useGetUserOrdersQuery,
     useGetOrderByIdQuery,
     useGetOrderByNumberQuery,

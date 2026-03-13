@@ -39,6 +39,9 @@ export const TAG_TYPES = {
     // Admin
     INVENTORY: 'Inventory',
     DASHBOARD: 'Dashboard',
+
+    ADDRESSES: 'Addresses',
+    USERSTATS: 'UserStats',
 } as const;
 
 export type TagType = typeof TAG_TYPES[keyof typeof TAG_TYPES];
