@@ -1,8 +1,8 @@
- 
+
 import type { IBaseDocument, IPrice } from "./base.types";
 import type { IAddress } from "./shop.types";
 
- 
+
 
 export enum EOrderStatus {
     PENDING = "pending",
@@ -44,6 +44,8 @@ export enum EShippingStatus {
 }
 
 export interface IOrder extends IBaseDocument {
+    paymentReference: string;
+    payment: any;
     orderNumber: string;
     userId: string;
 
@@ -78,7 +80,7 @@ export interface IOrder extends IBaseDocument {
     notes?: string;
     tags?: string[];
     meta: IOrderMeta;
-    
+
 }
 
 export interface IOrderItem {
@@ -101,6 +103,10 @@ export interface IOrderItem {
 }
 
 export interface IOrderShipping {
+    phone: string;
+    lastName: string;
+    email: string;
+    firstName: string;
     address: IAddress;
     method: IOrderShippingMethod;
     trackingNumber?: string;
@@ -188,4 +194,3 @@ export interface ICreateOrderPayload {
     notes?: string;
 }
 
- 

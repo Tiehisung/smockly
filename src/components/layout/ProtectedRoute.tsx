@@ -35,6 +35,7 @@ export function ProtectedRoute({
   if (requiredRole && !requiredRole.includes(user?.role as string)) {
     return <Navigate to="/unauthorized" replace />;
   }
+  // useScrollToTop();
 
   // Render child routes if logged in
   return <Outlet />;

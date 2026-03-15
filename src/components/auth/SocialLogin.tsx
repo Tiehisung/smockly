@@ -24,7 +24,7 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
       authService.updateUserLastLogin(user?.uid as string);
 
       onSuccess?.(user); //optional
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (error: any) {
       onError?.(error.message);
     } finally {
@@ -41,7 +41,7 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
       authService.updateUserLastLogin(user?.uid as string);
 
       onSuccess?.(user); //optional
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (error: any) {
       onError?.(error.message);
     } finally {

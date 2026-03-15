@@ -1,21 +1,22 @@
 import type { IPrice } from "./base.types";
-import type { IProduct, IProductVariant } from "./product.types";
-import type { IAddress,     } from "./shop.types";
+import type { IProductVariant } from "./product.types";
+import type { IAddress, } from "./shop.types";
 
 export interface ICartItem {
-    id: string; // Unique ID for cart item (productId + variant combo)
+    _id: string;
     productId: string;
-    productSlug: string;
     name: string;
+    slug: string;
     image: string;
-    price: IPrice;
-    originalPrice?: IPrice;
+    price: number;
+    originalPrice?: number;
     quantity: number;
     variant?: ICartItemVariant;
     maxQuantity: number;
     isAvailable: boolean;
     addedAt: string;
 }
+
 
 export interface ICartItemVariant {
     sku: string;
@@ -26,12 +27,14 @@ export interface ICartItemVariant {
 
 export interface ICart {
     id?: string;
+    firebaseUid: string;
+    userId?:string
     items: ICartItem[];
-    subtotal: IPrice;
-    discount: IPrice;
-    shipping: IPrice;
-    tax: IPrice;
-    total: IPrice;
+    subtotal: number;
+    discount: number;
+    shipping: number;
+    tax: number;
+    total: number;
     itemCount: number;
     uniqueItemCount: number;
     appliedCoupon?: IAppliedCoupon;
@@ -39,13 +42,15 @@ export interface ICart {
     billingAddress?: IAddress;
     shippingMethod?: IShippingMethod;
     notes?: string;
-    expiresAt?: string;
+    expiresAt?: string;  
     lastUpdated: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface IAppliedCoupon {
     code: string;
-    discount: IPrice;
+    discount: number;
     type: 'percentage' | 'fixed';
 }
 
@@ -68,7 +73,7 @@ export interface ICartTotals {
 
 // Cart Operations
 export type IAddToCartPayload = {
-    product: IProduct;
+    productId: string;
     quantity: number;
     variant?: IProductVariant;
 };

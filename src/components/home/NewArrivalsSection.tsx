@@ -1,7 +1,7 @@
 // src/components/home/NewArrivalsSection.tsx
 import { Link } from "react-router-dom";
-import { ProductCard } from "../products/ProductCard";
- 
+import { ProductCard } from "../../pages/product/ProductCard";
+
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import { getNewArrivals } from "../../data/shop";
 

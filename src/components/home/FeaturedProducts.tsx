@@ -1,6 +1,6 @@
 // src/components/home/FeaturedProducts.tsx
 import { useGetFeaturedProductsQuery } from "../../store/api/productsApi";
-import { ProductCard } from "../products/ProductCard";
+import { ProductCard } from "../../pages/product/ProductCard";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { allProducts } from "../../data/products";
 
@@ -8,7 +8,7 @@ export function FeaturedProducts() {
   const { data: products, isLoading } = useGetFeaturedProductsQuery(8);
 
   const normalProducts =
-    products || allProducts.filter((p) => p.featured)?.slice(0, 4);
+    products?.data || allProducts.filter((p) => p.featured)?.slice(0, 4);
 
   if (isLoading) return <LoadingSpinner />;
 

@@ -13,7 +13,7 @@ export const generateSlug = (name: string): string => {
 };
 
 // Helper function to format currency
-export const formatPrice = (amount: number): string => {
+export const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',

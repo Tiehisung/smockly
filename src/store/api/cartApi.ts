@@ -1,29 +1,30 @@
 // src/store/api/cartApi.ts
 
+import type { IApiResponse } from "../../types";
 import type { IAddToCartPayload, ICart, ICartItem, IUpdateCartItemPayload } from "../../types/cart.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
- 
+
 export const cartApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get cart (creates one if doesn't exist)
-        getCart: builder.query<ICart, void>({
+        getCart: builder.query<IApiResponse<ICart>, void>({
             query: () => '/cart',
             providesTags: [TAG_TYPES.CART],
         }),
 
         // Add item to cart
-        addToCart: builder.mutation<ICart, IAddToCartPayload>({
+        addToCart: builder.mutation<IApiResponse<ICart>, IAddToCartPayload>({
             query: (item) => ({
                 url: '/cart/items',
                 method: 'POST',
                 body: item,
             }),
-            invalidatesTags: [TAG_TYPES.CART],
+            invalidatesTags: [TAG_TYPES.CART] ,
         }),
 
         // Update cart item quantity
-        updateCartItem: builder.mutation<ICart, IUpdateCartItemPayload>({
+        updateCartItem: builder.mutation<IApiResponse<ICart>, IUpdateCartItemPayload>({
             query: ({ itemId, quantity }) => ({
                 url: `/cart/items/${itemId}`,
                 method: 'PUT',
@@ -33,7 +34,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Remove item from cart
-        removeFromCart: builder.mutation<ICart, string>({
+        removeFromCart: builder.mutation<IApiResponse<ICart>, string>({
             query: (itemId) => ({
                 url: `/cart/items/${itemId}`,
                 method: 'DELETE',
@@ -42,7 +43,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Clear cart
-        clearCart: builder.mutation<ICart, void>({
+        clearCart: builder.mutation<IApiResponse<ICart>, void>({
             query: () => ({
                 url: '/cart/clear',
                 method: 'DELETE',
@@ -51,7 +52,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Apply coupon
-        applyCoupon: builder.mutation<ICart, string>({
+        applyCoupon: builder.mutation<IApiResponse<ICart>, string>({
             query: (code) => ({
                 url: '/cart/apply-coupon',
                 method: 'POST',
@@ -61,7 +62,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Remove coupon
-        removeCoupon: builder.mutation<ICart, void>({
+        removeCoupon: builder.mutation<IApiResponse<ICart>, void>({
             query: () => ({
                 url: '/cart/remove-coupon',
                 method: 'DELETE',
@@ -70,7 +71,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Set shipping method
-        setShippingMethod: builder.mutation<ICart, string>({
+        setShippingMethod: builder.mutation<IApiResponse<ICart>, string>({
             query: (methodId) => ({
                 url: '/cart/shipping-method',
                 method: 'POST',
@@ -80,7 +81,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Merge guest cart with user cart (after login)
-        mergeCart: builder.mutation<ICart, ICartItem[]>({
+        mergeCart: builder.mutation<IApiResponse<ICart>, ICartItem[]>({
             query: (guestCart) => ({
                 url: '/cart/merge',
                 method: 'POST',
@@ -90,7 +91,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Save cart for later
-        saveForLater: builder.mutation<ICart, string>({
+        saveForLater: builder.mutation<IApiResponse<ICart>, string>({
             query: (itemId) => ({
                 url: `/cart/items/${itemId}/save-for-later`,
                 method: 'POST',
@@ -99,7 +100,7 @@ export const cartApi = baseApi.injectEndpoints({
         }),
 
         // Move to cart from saved
-        moveToCart: builder.mutation<ICart, string>({
+        moveToCart: builder.mutation<IApiResponse<ICart>, string>({
             query: (itemId) => ({
                 url: `/cart/items/${itemId}/move-to-cart`,
                 method: 'POST',

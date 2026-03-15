@@ -2,7 +2,8 @@ import { toast } from "sonner";
 import type { IApiResponse } from "../types";
 
 export const smartToast = ({ success, message, error, }: Partial<Omit<IApiResponse, 'error'> & { error: any }>) => {
-    const msg = error ? error?.message : message
+
+    const msg = message || error?.data?.message || error?.message || error?.toString()
     const type = error ? false : success
 
     switch (type) {

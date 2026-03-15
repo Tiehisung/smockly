@@ -9,12 +9,13 @@ import {
     useApplyCouponMutation,
     useRemoveCouponMutation,
 } from '../store/api/cartApi';
- 
-import toast from 'react-hot-toast';
 import type { IAddToCartPayload } from '../types/cart.types';
+import { smartToast } from '../lib/toast';
 
 export const useCart = () => {
     const { data: cart, isLoading, refetch } = useGetCartQuery();
+    const cartData = cart?.data
+
     const [addToCartMutation] = useAddToCartMutation();
     const [updateCartItemMutation] = useUpdateCartItemMutation();
     const [removeFromCartMutation] = useRemoveFromCartMutation();
@@ -24,60 +25,66 @@ export const useCart = () => {
 
     const addToCart = useCallback(async (payload: IAddToCartPayload) => {
         try {
-            await addToCartMutation(payload).unwrap();
-            toast.success('Added to cart');
+            const added = await addToCartMutation(payload).unwrap();
+            smartToast(added)
         } catch (error) {
-            toast.error('Failed to add to cart');
+
+            smartToast({ error: 'Failed to add to cart' })
         }
     }, [addToCartMutation]);
 
     const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
         try {
-            await updateCartItemMutation({ itemId, quantity }).unwrap();
+            const response = await updateCartItemMutation({ itemId, quantity }).unwrap();
+            smartToast(response)
         } catch (error) {
-            toast.error('Failed to update cart');
+            smartToast({ error: 'Failed to update cart' })
         }
     }, [updateCartItemMutation]);
 
     const removeItem = useCallback(async (itemId: string) => {
         try {
-            await removeFromCartMutation(itemId).unwrap();
-            toast.success('Removed from cart');
+            const response = await removeFromCartMutation(itemId).unwrap();
+            smartToast(response)
         } catch (error) {
-            toast.error('Failed to remove item');
+
+            smartToast({ error: 'Failed to remove item' })
         }
     }, [removeFromCartMutation]);
 
     const clearCart = useCallback(async () => {
         try {
-            await clearCartMutation().unwrap();
-            toast.success('Cart cleared');
+            const response = await clearCartMutation().unwrap();
+            smartToast(response)
         } catch (error) {
-            toast.error('Failed to clear cart');
+
+            smartToast({ error: 'Failed to clear cart' })
         }
     }, [clearCartMutation]);
 
     const applyCoupon = useCallback(async (code: string) => {
         try {
-            await applyCouponMutation(code).unwrap();
-            toast.success('Coupon applied');
+            const response = await applyCouponMutation(code).unwrap();
+            smartToast(response)
         } catch (error) {
-            toast.error('Invalid coupon code');
+            smartToast({ error: 'Invalid coupon code' })
+
         }
     }, [applyCouponMutation]);
 
     const removeCoupon = useCallback(async () => {
         try {
-            await removeCouponMutation().unwrap();
-            toast.success('Coupon removed');
+            const response = await removeCouponMutation().unwrap();
+            smartToast(response)
         } catch (error) {
-            toast.error('Failed to remove coupon');
+
+            smartToast({ error: 'Failed to remove coupon' })
         }
     }, [removeCouponMutation]);
 
-    const itemCount = useMemo(() => cart?.itemCount || 0, [cart]);
-    const subtotal = useMemo(() => cart?.subtotal?.amount || 0, [cart]);
-    const total = useMemo(() => cart?.total?.amount || 0, [cart]);
+    const itemCount = useMemo(() => cartData?.itemCount || 0, [cart]);
+    const subtotal = useMemo(() => cartData?.subtotal?.amount || 0, [cart]);
+    const total = useMemo(() => cartData?.total?.amount || 0, [cart]);
 
     return {
         cart,

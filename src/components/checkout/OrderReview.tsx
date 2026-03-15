@@ -12,7 +12,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
-import { currencySymbols, formatPrice } from "../../utils/formatPrice";
+import { ECurrencySymbols } from "../../utils/currency";
+import { formatAmount } from "../../utils/amount";
+ 
 
 interface OrderReviewProps {
   shippingDetails: IShippingDetails;
@@ -30,8 +32,8 @@ export function OrderReview({
   onPayWithPaystack,
   isProcessing,
 }: OrderReviewProps) {
-  const currency = cart?.subtotal?.currency || "USD";
-  const currencySymbol = currencySymbols[currency] || "$";
+  const currency =  "GHS";
+  const currencySymbol = ECurrencySymbols[currency] || "₵";
 
   // Payment method icons
   const paymentMethods = [
@@ -80,14 +82,16 @@ export function OrderReview({
         <h3 className="font-medium text-gray-900 mb-3">Order Items</h3>
         <div className="space-y-3">
           {cart?.items?.map((item) => (
-            <div key={item?.id} className="flex items-center space-x-3">
+            <div key={item?._id} className="flex items-center space-x-3">
               <img
                 src={item?.image}
                 alt={item?.name}
                 className="w-16 h-16 object-cover rounded"
               />
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{item?.name}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {item?.name}
+                </p>
                 {item?.variant && (
                   <p className="text-xs text-gray-500">
                     {item?.variant.size && `Size: ${item?.variant.size} `}
@@ -98,7 +102,7 @@ export function OrderReview({
               </div>
               <p className="text-sm font-medium text-gray-900">
                 {currencySymbol}
-                {(item?.price.amount * item?.quantity).toFixed(2)}
+                {(item?.price * item?.quantity).toFixed(2)}
               </p>
             </div>
           ))}
@@ -111,28 +115,28 @@ export function OrderReview({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Subtotal</span>
-            <span className="text-gray-900">{formatPrice(cart?.subtotal)}</span>
+            <span className="text-gray-900">{formatAmount(cart?.subtotal)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Shipping</span>
             <span className="text-gray-900">
-              {!cart?.shipping?.amount ? "Free" : formatPrice(cart.shipping)}
+              {!cart?.shipping ? "Free" : formatAmount(cart.shipping)}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Tax</span>
-            <span className="text-gray-900">{formatPrice(cart?.tax)}</span>
+            <span className="text-gray-900">{formatAmount(cart?.tax)}</span>
           </div>
-          {!cart?.discount.amount && (
+          {!cart?.discount && (
             <div className="flex justify-between text-green-600">
               <span>Discount</span>
-              <span>-{formatPrice(cart?.discount)}</span>
+              <span>-{formatAmount(cart?.discount)}</span>
             </div>
           )}
           <div className="border-t border-gray-200 pt-2 mt-2">
             <div className="flex justify-between font-semibold">
               <span>Total</span>
-              <span className="text-blue-600">{formatPrice(cart?.total)}</span>
+              <span className="text-blue-600">{formatAmount(cart?.total)}</span>
             </div>
           </div>
         </div>
@@ -213,7 +217,7 @@ export function OrderReview({
             ) : (
               <>
                 <Lock className="h-4 w-4 mr-2" />
-                Pay {formatPrice(cart?.total)}
+                Pay {formatAmount(cart?.total)}
               </>
             )}
           </button>

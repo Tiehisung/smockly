@@ -2,6 +2,7 @@
 import type { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { AccountLayout } from "../pages/account/AccountLayout";
+import { Wishlist } from "../pages/account/Wishlist";
 // import { AccountOverview } from "../pages/account/AccountOverview";
 // import { AccountOrders } from "../pages/account/AccountOrders";
 // import { AccountOrderDetails } from "../pages/account/AccountOrderDetails";
@@ -32,10 +33,10 @@ export const accountRoutes: RouteObject = {
         //   path: "addresses",
         //   element: <AccountAddresses />,
         // },
-        // {
-        //   path: "wishlist",
-        //   element: <AccountWishlist />,
-        // },
+        {
+          path: "wishlist",
+          element: <Wishlist />,
+        },
         // {
         //   path: "settings",
         //   element: <AccountSettings />,

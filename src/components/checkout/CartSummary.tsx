@@ -1,8 +1,7 @@
 // src/components/checkout/CartSummary.tsx
 import { Link } from "react-router-dom";
-
-import { formatPrice } from "../../utils/formatPrice";
 import type { ICart } from "../../types/cart.types";
+import { formatAmount } from "../../utils/amount";
 
 interface CartSummaryProps {
   cart?: ICart;
@@ -14,7 +13,7 @@ export function CartSummary({ cart }: CartSummaryProps) {
       {/* Items List */}
       <div className="space-y-3 max-h-60 overflow-y-auto">
         {cart?.items?.map((item) => (
-          <div key={item?.id} className="flex items-center space-x-3">
+          <div key={item?._id} className="flex items-center space-x-3">
             <img
               src={item?.image}
               alt={item?.name}
@@ -33,7 +32,7 @@ export function CartSummary({ cart }: CartSummaryProps) {
               <p className="text-xs text-gray-500">Qty: {item?.quantity}</p>
             </div>
             <p className="text-sm font-medium text-gray-900">
-              {item?.price.currency + item?.price.amount * item?.quantity}
+              {item?.price * item?.quantity}
             </p>
           </div>
         ))}
@@ -43,30 +42,28 @@ export function CartSummary({ cart }: CartSummaryProps) {
       <div className="border-t border-gray-200 pt-4 space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal</span>
-          <span className="text-gray-900">{formatPrice(cart?.subtotal)}</span>
+          <span className="text-gray-900">{formatAmount(cart?.subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Shipping</span>
           <span className="text-gray-900">
-            {cart?.shipping.amount === 0
-              ? "Free"
-              : `${formatPrice(cart?.shipping)}`}
+            {cart?.shipping === 0 ? "Free" : `${formatAmount(cart?.shipping)}`}
           </span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Tax</span>
-          <span className="text-gray-900">{formatPrice(cart?.tax)}</span>
+          <span className="text-gray-900">{formatAmount(cart?.tax)}</span>
         </div>
-        {(cart?.discount?.amount ?? 0) > 0 && (
+        {(cart?.discount ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-green-600">
             <span>Discount</span>
-            <span>-{formatPrice(cart?.discount)}</span>
+            <span>-{formatAmount(cart?.discount)}</span>
           </div>
         )}
         <div className="border-t border-gray-200 pt-2 mt-2">
           <div className="flex justify-between font-semibold">
             <span className="text-gray-900">Total</span>
-            <span className="text-blue-600">{formatPrice(cart?.total)}</span>
+            <span className="text-blue-600">{formatAmount(cart?.total)}</span>
           </div>
         </div>
       </div>

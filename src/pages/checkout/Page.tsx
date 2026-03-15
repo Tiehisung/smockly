@@ -29,6 +29,8 @@ export function Checkout() {
   const { user } = useAuth();
   const { cart } = useCart();
 
+  const cartData=cart?.data
+
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("shipping");
   const [shippingDetails, setShippingDetails] =
     useState<IShippingDetails | null>(null);
@@ -39,11 +41,11 @@ export function Checkout() {
     useInitializePaystackPaymentMutation();
 
   // Get total from cart
-  const total = cart?.total?.amount || 0;
+  const total = cartData?.total || 0;
 
   // Redirect if cart is empty
   useEffect(() => {
-    if (!isProcessing && cart?.items.length === 0 && !orderComplete) {
+    if (!isProcessing && cartData?.items.length === 0 && !orderComplete) {
       navigate("/cart");
     }
   }, [cart, navigate, orderComplete, isProcessing]);
@@ -68,17 +70,17 @@ export function Checkout() {
     }
 
     try {
-      // ✅ Fixed: Properly format shipping address for metadata
+      //  Fixed: Properly format shipping address for metadata
       const response = await initializePayment({
         email: shippingDetails?.email || (user?.email as string),
         amount: total,
         metadata: {
           orderId: `ORD-${Date.now()}`,
           customerId: user?.uid,
-          items: cart?.items.map((item) => ({
+          items: cartData?.items.map((item) => ({
             name: item.name,
             quantity: item.quantity,
-            price: item.price.amount,
+            price: item.price,
           })),
         },
       }).unwrap();
@@ -109,7 +111,7 @@ export function Checkout() {
     return <LoadingSpinner />;
   }
 
-  if (cart?.items.length === 0 && !orderComplete) {
+  if (cartData?.items?.length === 0 && !orderComplete) {
     return null; // Will redirect
   }
 
@@ -186,7 +188,7 @@ export function Checkout() {
               {currentStep === "review" && (
                 <OrderReview
                   shippingDetails={shippingDetails!}
-                  cart={cart as ICart}
+                  cart={cartData as ICart}
                   onBack={handleBack}
                   onPayWithPaystack={handlePayWithPaystack}
                   isProcessing={isProcessing}
@@ -209,7 +211,7 @@ export function Checkout() {
                 Order Summary
               </h2>
 
-              <CartSummary cart={cart as ICart} />
+              <CartSummary cart={cartData as ICart} />
 
               {/* Trust Badges */}
               <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">

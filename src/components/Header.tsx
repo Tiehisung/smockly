@@ -1,20 +1,17 @@
 // src/components/layout/Header.tsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
- 
-import {
-  ShoppingCartIcon,
-  UserIcon,
-  HeartIcon,
-} from "@heroicons/react/24/outline";
- 
-import { useAuth } from "../contexts/AuthContext";
+
+import { ShoppingCartIcon, HeartIcon } from "@heroicons/react/24/outline";
+
 import { useCart } from "../hooks/useCart";
 import { CartDrawer } from "./cart/CartDrawer";
+import { UserMenu } from "./layout/UserMenu";
+import { useWishlist } from "../hooks/useWishlist";
 
 export function Header() {
-  const { user } = useAuth();
   const { itemCount } = useCart();
+   const { itemCount:wishItemCount } = useWishlist();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
@@ -24,7 +21,7 @@ export function Header() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="text-2xl font-bold text-blue-600">
-             GH Smockly
+              GH Smockly
             </Link>
 
             {/* Navigation */}
@@ -32,7 +29,7 @@ export function Header() {
               <Link to="/shop" className="text-gray-700 hover:text-blue-600">
                 Shop
               </Link>
-              
+
               <Link
                 to="/categories"
                 className="text-gray-700 hover:text-blue-600"
@@ -53,8 +50,13 @@ export function Header() {
             {/* Icons */}
             <div className="flex items-center space-x-4">
               {/* Wishlist */}
-              <Link to="/wishlist" className="relative">
-                <HeartIcon className="h-6 w-6 text-gray-700 hover:text-blue-600" />
+              <Link to="/account/wishlist" className="relative">
+                <HeartIcon className="w-6 h-6" />
+                {wishItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishItemCount}
+                  </span>
+                )}
               </Link>
 
               {/* Cart */}
@@ -68,28 +70,7 @@ export function Header() {
               </button>
 
               {/* User Menu */}
-              {user ? (
-                <Link to="/profile">
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    {user.photoURL ? (
-                      <img
-                        src={user.photoURL}
-                        alt={user.displayName || ""}
-                        className="h-8 w-8 rounded-full"
-                      />
-                    ) : (
-                      <UserIcon className="h-5 w-5 text-gray-600" />
-                    )}
-                  </div>
-                </Link>
-              ) : (
-                <Link
-                  to="/login"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  Sign In
-                </Link>
-              )}
+              <UserMenu />
             </div>
           </div>
         </nav>

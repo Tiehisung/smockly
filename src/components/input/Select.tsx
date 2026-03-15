@@ -1,16 +1,16 @@
 // src/components/ui/Select.tsx
 import React from "react";
 import { cn } from "../../utils/cn";
- 
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   options: Array<{ value: string; label: string }>;
+  placeholder?: string;
 }
 
 export const SELECT = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, ...props }, ref) => {
+  ({ className, label, error, options, placeholder, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -27,6 +27,7 @@ export const SELECT = React.forwardRef<HTMLSelectElement, SelectProps>(
           )}
           {...props}
         >
+          {placeholder && <option value="">{placeholder}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

@@ -1,9 +1,9 @@
 // src/pages/Bestsellers.tsx
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ProductCard } from "../components/products/ProductCard";
-import { ProductSort } from "../components/products/ProductSort";
-import { Pagination } from "../components/ui/Pagination";
+import { ProductCard } from "./product/ProductCard";
+import { ProductSort } from "./product/ProductSort";
+import { Pagination } from "../components/Pagination";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { FireIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import type { IPagination } from "../types";
@@ -11,7 +11,6 @@ import { allCategories } from "../data/categories";
 import { getBestsellers } from "../data/shop";
 import { useGetBestsellersQuery } from "../store/api/productsApi";
 import { CurrencyIcon, StarIcon } from "../assets/svg";
- 
 
 export function Bestsellers() {
   const [searchParams, setSearchParams] = useSearchParams();

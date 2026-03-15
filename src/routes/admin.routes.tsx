@@ -5,7 +5,11 @@ import { AdminLayout } from "../pages/admin/AdminLayout";
 // import { EUserRole } from "../types/user.types";
 import { AdminProducts } from "../pages/admin/products/ProductsPage";
 import { AdminProductForm } from "../pages/admin/products/ProductForm";
-// import { AdminDashboard } from "../pages/admin/AdminDashboard";
+import { AdminDashboard } from "../pages/admin/Dashboard";
+import { AdminOrderDetails } from "../pages/admin/orders/AdminOrderDetails";
+import { AdminOrders } from "../pages/admin/orders/AdminOrders";
+import { AdminCategories } from "../pages/admin/categories/AdminCategories";
+import { AdminCategoryForm } from "../pages/admin/categories/AdminCategoryForm";
 // import { AdminProductForm } from "../pages/admin/AdminProductForm";
 // import { AdminOrders } from "../pages/admin/AdminOrders";
 // import { AdminOrderDetails } from "../pages/admin/AdminOrderDetails";
@@ -28,10 +32,10 @@ export const adminRoutes: RouteObject = {
     {
       element: <AdminLayout />,
       children: [
-        //     {
-        //       index: true,
-        //       element: <AdminDashboard />,
-        //     },
+        {
+          index: true,
+          element: <AdminDashboard />,
+        },
         {
           path: "products",
           children: [
@@ -49,19 +53,37 @@ export const adminRoutes: RouteObject = {
             },
           ],
         },
-        //     {
-        //       path: "orders",
-        //       children: [
-        //         {
-        //           index: true,
-        //           element: <AdminOrders />,
-        //         },
-        //         {
-        //           path: ":orderId",
-        //           element: <AdminOrderDetails />,
-        //         },
-        //       ],
-        //     },
+        {
+          path: "orders",
+          children: [
+            {
+              index: true,
+              element: <AdminOrders />,
+            },
+            {
+              path: ":orderId",
+              element: <AdminOrderDetails />,
+            },
+          ],
+        },
+
+        {
+          path: "categories",
+          children: [
+            {
+              index: true,
+              element: <AdminCategories />,
+            },
+            {
+              path: "new",
+              element: <AdminCategoryForm />,
+            },
+            {
+              path: "edit/:categoryId",
+              element: <AdminCategoryForm />,
+            },
+          ],
+        },
         //     {
         //       path: "customers",
         //       element: <AdminCustomers />,
@@ -69,10 +91,6 @@ export const adminRoutes: RouteObject = {
         //     {
         //       path: "users",
         //       element: <AdminUsers />,
-        //     },
-        //     {
-        //       path: "categories",
-        //       element: <AdminCategories />,
         //     },
         //     {
         //       path: "coupons",

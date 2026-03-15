@@ -1,6 +1,6 @@
 // src/components/home/Bestsellers.tsx
 import { useGetBestsellersQuery } from "../../store/api/productsApi";
-import { ProductCard } from "../products/ProductCard";
+import { ProductCard } from "../../pages/product/ProductCard";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { Link } from "react-router-dom";
 import { getBestsellers } from "../../data/shop";
@@ -8,7 +8,7 @@ import { getBestsellers } from "../../data/shop";
 export function Bestsellers() {
   const { data: products, isLoading } = useGetBestsellersQuery(4);
 
-  const normalProducts = products || getBestsellers();
+  const normalProducts = products?.data || getBestsellers();
 
   if (isLoading) {
     return (

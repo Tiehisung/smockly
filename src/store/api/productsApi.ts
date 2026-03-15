@@ -1,7 +1,7 @@
 // src/store/api/productsApi.ts
 
 
-import type { IPaginatedResponse } from "../../types";
+import type { IApiResponse, IPaginatedResponse } from "../../types";
 import type { IProduct, IProductFilters } from "../../types/product.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
@@ -9,9 +9,7 @@ import { TAG_TYPES } from "./tags";
 export const productsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get all products with filters
-        getProducts: builder.query<
-            IPaginatedResponse<IProduct>['data'],
-            Partial<IProductFilters>
+        getProducts: builder.query<IApiResponse<IProduct[]>, Partial<IProductFilters>
         >({
             query: (filters) => ({
                 url: '/products',
@@ -31,21 +29,15 @@ export const productsApi = baseApi.injectEndpoints({
                     tags: filters?.tags?.join(','),
                 },
             }),
-            providesTags: (result) =>
-                result
-                    ? [
-                        ...result.items.map(({ _id }) => ({ type: TAG_TYPES.PRODUCTS, id: _id })),
-                        { type: TAG_TYPES.PRODUCTS, id: 'LIST' },
-                    ]
-                    : [{ type: TAG_TYPES.PRODUCTS, id: 'LIST' }],
+            providesTags: (_result) => [TAG_TYPES.PRODUCTS,],
         }),
 
         // Get single product by slug or ID
-        getProductBySlug: builder.query<IProduct, string>({
+        getProductBySlug: builder.query<IApiResponse<IProduct>, string>({
             query: (slug) => `/products/${slug}`,
             providesTags: (result, _error, slug) => [
                 { type: TAG_TYPES.PRODUCT, id: slug },
-                { type: TAG_TYPES.PRODUCT, id: result?._id },
+                { type: TAG_TYPES.PRODUCT, id: result?.data?._id },
             ],
         }),
 
@@ -56,26 +48,26 @@ export const productsApi = baseApi.injectEndpoints({
         }),
 
         // Get featured products
-        getFeaturedProducts: builder.query<IProduct[], number>({
+        getFeaturedProducts: builder.query<IApiResponse<IProduct[]>, number>({
             query: (limit = 8) => `/products/featured?limit=${limit}`,
             providesTags: [{ type: TAG_TYPES.FEATURED }],
         }),
 
         // Get bestsellers
-        getBestsellers: builder.query<IProduct[], number>({
+        getBestsellers: builder.query<IApiResponse<IProduct[]>, number>({
             query: (limit = 8) => `/products/bestsellers?limit=${limit}`,
             providesTags: [{ type: TAG_TYPES.BESTSELLERS }],
         }),
 
         // Get new arrivals
-        getNewArrivals: builder.query<IProduct[], number>({
+        getNewArrivals: builder.query<IApiResponse<IProduct[]>, number>({
             query: (limit = 8) => `/products/new?limit=${limit}`,
             providesTags: [{ type: TAG_TYPES.NEW }],
         }),
 
         // Get products by category
         getProductsByCategory: builder.query<
-            IPaginatedResponse<IProduct>['data'],
+            IApiResponse<IProduct[]>,
             { category: string; page?: number; limit?: number }
         >({
             query: ({ category, page = 1, limit = 12 }) => ({
@@ -102,7 +94,7 @@ export const productsApi = baseApi.injectEndpoints({
         }),
 
         // Get related products
-        getRelatedProducts: builder.query<IProduct[], { productId: string; limit?: number }>({
+        getRelatedProducts: builder.query<IApiResponse<IProduct[]>, { productId: string; limit?: number }>({
             query: ({ productId, limit = 4 }) =>
                 `/products/${productId}/related?limit=${limit}`,
             providesTags: (_result, _error, { productId }) => [

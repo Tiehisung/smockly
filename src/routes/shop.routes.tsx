@@ -4,11 +4,12 @@ import { ShopPage } from "../pages/shop/Shop";
 import { CategoryPage } from "../pages/category/CategoryPage";
 import { SearchResults } from "../pages/product/Search";
 import { CartPage } from "../pages/cart/CartPage";
-import { CategoriesPage } from "../pages/category/Categories";
+import { CategoriesPage } from "../pages/category/CategoriesPage";
 import { NewArrivals } from "../pages/NewArrivals";
 import { Bestsellers } from "../pages/BestSellers";
-import { ProductDetails } from "../pages/product/Details";
-import { AccountWishlist } from "../pages/account/Wishlist";
+import { ProductDetails } from "../pages/product/ProductDetailsPage";
+import { Wishlist } from "../pages/account/Wishlist";
+
  
 export const shopRoutes: RouteObject[] = [
   {
@@ -46,6 +47,6 @@ export const shopRoutes: RouteObject[] = [
   },
   {
     path: "wishlist",
-    element: <AccountWishlist />,
+    element: <Wishlist />,
   },
 ];

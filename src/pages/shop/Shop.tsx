@@ -3,16 +3,16 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useGetProductsQuery } from "../../store/api/productsApi";
 import { useGetCategoriesQuery } from "../../store/api/categoriesApi";
-import { ProductCard } from "../../components/products/ProductCard";
+import { ProductCard } from "../product/ProductCard";
 
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
 import type { EProductCategory } from "../../types/product.types";
-import { ProductFilters } from "../../components/products/ProductFilters";
-import { ProductSort } from "../../components/products/ProductSort";
-import { Pagination } from "../../components/ui/Pagination";
-import { allCategories } from "../../data/categories";
-import { allProducts } from "../../data/products";
+import { ProductFilters } from "../product/ProductFilters";
+import { ProductSort } from "../product/ProductSort";
+import { Pagination } from "../../components/Pagination";
+
 import useScrollToTop from "../../hooks/useScrollToTop";
+import { OverlayLoader } from "../../components/loader/OverlayLoader";
 
 export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,7 +20,6 @@ export function ShopPage() {
 
   // Get filters from URL
   const page = Number(searchParams.get("page")) || 1;
-  const category = searchParams.get("category") || "smocks";
   const sort = searchParams.get("sort") || "newest";
   const minPrice = Number(searchParams.get("minPrice")) || 0;
   const maxPrice = Number(searchParams.get("maxPrice")) || 1000;
@@ -31,37 +30,25 @@ export function ShopPage() {
   // Fetch categories for filter sidebar
   const { data: categories, isLoading: isLoadingCategories } =
     useGetCategoriesQuery({});
+  const category = searchParams.get("category");
 
   // Fetch products with filters
-  const { data: productsData, isLoading: isLoadingProducts } =
-    useGetProductsQuery({
-      page,
-      limit: 12,
-      categories: category ? [category as EProductCategory] : [],
-      sizes,
-      colors,
-      priceRange: [minPrice, maxPrice],
-      sortBy: sort as any,
-      search,
-    });
+  const {
+    data: productsData,
+    isLoading: isLoadingProducts,
+    isFetching,
+  } = useGetProductsQuery({
+    page,
+    limit: 12,
+    categories: category ? [category as EProductCategory] : [],
+    sizes,
+    colors,
+    priceRange: [minPrice, maxPrice],
+    sortBy: sort as any,
+    search,
+  });
 
-  // Dummy
-
-  const normalCategories = categories || allCategories;
-
-  // Get products for this category
-  const dummyProducts = allProducts.filter((p) => p.category === category);
-  const normalProducts = productsData || {
-    items: dummyProducts,
-    pagination: {
-      page: 1,
-      limit: 4,
-      total: 12,
-      pages: 3,
-    },
-  };
-
-  useScrollToTop()
+  useScrollToTop();
 
   // if (error) return <div>Error loading products</div>;
 
@@ -82,7 +69,7 @@ export function ShopPage() {
         <div className="flex gap-8">
           {/* Filters Sidebar */}
           <ProductFilters
-            categories={normalCategories || []}
+            categories={categories?.data || []}
             mobileFiltersOpen={mobileFiltersOpen}
             setMobileFiltersOpen={setMobileFiltersOpen}
             isLoading={isLoadingCategories}
@@ -94,7 +81,7 @@ export function ShopPage() {
             <ProductSort />
 
             {/* Products */}
-            {normalProducts?.items.length === 0 ? (
+            {productsData?.data?.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500">No products found</p>
               </div>
@@ -103,23 +90,26 @@ export function ShopPage() {
                 {isLoadingProducts ? (
                   <LoadingSpinner />
                 ) : (
-                  <div>
+                  <div className="relative">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {normalProducts?.items.map((product) => (
+                      {productsData?.data?.map((product) => (
                         <ProductCard key={product._id} product={product} />
                       ))}
                     </div>
 
-                    {normalProducts?.pagination &&
-                      normalProducts.pagination.pages > 1 && (
+                    {productsData?.pagination &&
+                      productsData.pagination.pages > 1 && (
                         <Pagination
-                          pagination={normalProducts.pagination}
+                          pagination={productsData.pagination}
                           onPageChange={(page) => {
                             searchParams.set("page", page.toString());
                             setSearchParams(searchParams);
                           }}
                         />
                       )}
+                    <OverlayLoader
+                      isLoading={isFetching && !isLoadingProducts}
+                    />
                   </div>
                 )}
               </>

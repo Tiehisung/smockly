@@ -24,6 +24,7 @@ export const TAG_TYPES = {
     // Orders
     ORDERS: 'Orders',
     ORDER: 'Order',
+    ORDERSTATS: 'OrderStats',
 
     // Reviews
     REVIEWS: 'Reviews',

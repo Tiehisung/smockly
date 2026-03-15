@@ -1,7 +1,6 @@
-// src/pages/Cart.tsx
+// src/pages/cartData?.tsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import {
   TrashIcon,
   ArrowLeftIcon,
@@ -14,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCart } from "../../hooks/useCart";
-import { formatPrice } from "../../utils/formatPrice";
+import { formatAmount } from "../../utils/amount";
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -28,6 +27,8 @@ export function CartPage() {
     applyCoupon,
     removeCoupon,
   } = useCart();
+
+  const cartData = cart?.data;
 
   const [couponCode, setCouponCode] = useState("");
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
@@ -55,10 +56,10 @@ export function CartPage() {
   };
 
   const handleSelectAll = () => {
-    if (selectedItems.length === cart?.items.length) {
+    if (selectedItems.length === cartData?.items.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cart?.items.map((item) => item.id) || []);
+      setSelectedItems(cartData?.items.map((item) => item._id) || []);
     }
   };
 
@@ -85,7 +86,7 @@ export function CartPage() {
     }
   };
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || cartData?.items.length === 0) {
     return (
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -158,13 +159,13 @@ export function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             {/* Bulk Actions */}
-            {cart.items.length > 1 && (
+            {(cartData?.items?.length || 0) > 1 && (
               <div className="bg-gray-50 rounded-lg p-4 mb-4 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={selectedItems.length === cart.items.length}
+                      checked={selectedItems.length === cartData?.items.length}
                       onChange={handleSelectAll}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
@@ -190,24 +191,24 @@ export function CartPage() {
 
             {/* Cart Items List */}
             <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
-              {cart.items.map((item) => (
+              {cartData?.items.map((item) => (
                 <div
-                  key={item.id}
+                  key={item._id}
                   className="p-6 flex flex-col sm:flex-row gap-6"
                 >
                   {/* Checkbox */}
                   <div className="flex items-start">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectItem(item.id)}
+                      checked={selectedItems.includes(item._id)}
+                      onChange={() => handleSelectItem(item._id)}
                       className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* Product Image */}
                   <div className="shrink-0">
-                    <Link to={`/product/${item.productSlug}`}>
+                    <Link to={`/product/${item.slug}`}>
                       <img
                         src={item.image}
                         alt={item.name}
@@ -221,7 +222,7 @@ export function CartPage() {
                     <div className="flex justify-between">
                       <div>
                         <Link
-                          to={`/product/${item.productSlug}`}
+                          to={`/product/${item.slug}`}
                           className="text-lg font-semibold text-gray-900 hover:text-blue-600"
                         >
                           {item.name}
@@ -238,7 +239,7 @@ export function CartPage() {
                         )}
                       </div>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item._id)}
                         className="text-gray-400 hover:text-red-600 transition-colors"
                         title="Remove item"
                       >
@@ -253,7 +254,7 @@ export function CartPage() {
                         <select
                           value={item.quantity}
                           onChange={(e) =>
-                            updateQuantity(item.id, parseInt(e.target.value))
+                            updateQuantity(item._id, parseInt(e.target.value))
                           }
                           className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-blue-500 focus:border-blue-500"
                         >
@@ -266,17 +267,11 @@ export function CartPage() {
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-bold text-gray-900">
-                          {formatPrice({
-                            ...item.price,
-                            amount: item.price.amount * item.quantity,
-                          })}
+                          {formatAmount(item.price * item.quantity)}
                         </div>
                         {item.originalPrice && (
                           <div className="text-sm text-gray-500 line-through">
-                            {formatPrice({
-                              ...item.price,
-                              amount: item.originalPrice.amount * item.quantity,
-                            })}
+                            {formatAmount(item.originalPrice * item.quantity)}
                           </div>
                         )}
                       </div>
@@ -287,7 +282,7 @@ export function CartPage() {
             </div>
 
             {/* Clear Cart Button */}
-            {cart.items.length > 0 && (
+            {(cartData?.items.length || 0) > 0 && (
               <div className="mt-4 text-right">
                 <button
                   onClick={() => {
@@ -326,9 +321,9 @@ export function CartPage() {
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="Enter code"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"
-                    disabled={!!cart.appliedCoupon}
+                    disabled={!!cartData?.appliedCoupon}
                   />
-                  {cart.appliedCoupon ? (
+                  {cartData?.appliedCoupon ? (
                     <button
                       onClick={handleRemoveCoupon}
                       className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700"
@@ -348,9 +343,9 @@ export function CartPage() {
                 {couponError && (
                   <p className="mt-1 text-sm text-red-600">{couponError}</p>
                 )}
-                {cart.appliedCoupon && (
+                {cartData?.appliedCoupon && (
                   <p className="mt-2 text-sm text-green-600">
-                    Coupon {cart.appliedCoupon.code} applied!
+                    Coupon {cartData?.appliedCoupon.code} applied!
                   </p>
                 )}
               </div>
@@ -360,27 +355,27 @@ export function CartPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium text-gray-900">
-                    {cart.subtotal.currency + cart.subtotal.amount}
+                    {formatAmount(cartData?.subtotal)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-medium text-gray-900">
-                    {cart.shipping.amount === 0
+                    {cartData?.shipping === 0
                       ? "Free"
-                      : formatPrice(cart.shipping)}
+                      : formatAmount(cartData?.shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax (10%)</span>
                   <span className="font-medium text-gray-900">
-                    {formatPrice(cart.tax)}
+                    {formatAmount(cartData?.tax)}
                   </span>
                 </div>
-                {(cart?.discount?.amount ?? 0) > 0 && (
+                {(cartData?.discount ?? 0) > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-{formatPrice(cart.discount)}</span>
+                    <span>-{formatAmount(cartData?.discount)}</span>
                   </div>
                 )}
               </div>
@@ -388,7 +383,9 @@ export function CartPage() {
               {/* Total */}
               <div className="flex justify-between text-lg font-bold mb-6">
                 <span>Total</span>
-                <span className="text-blue-600">{formatPrice(cart.total)}</span>
+                <span className="text-blue-600">
+                  {formatAmount(cartData?.total)}
+                </span>
               </div>
 
               {/* Checkout Button */}

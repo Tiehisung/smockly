@@ -1,9 +1,11 @@
 // src/store/api/adminApi.ts
 
+import type { IApiResponse } from "../../types";
+import type { IOrder } from "../../types/order.types";
+import type { IProduct } from "../../types/product.types";
 import { baseApi } from "./baseApi";
 
-
-
+// src/types/dashboard.types.ts
 export interface IDashboardStats {
     revenue: {
         today: number;
@@ -11,6 +13,7 @@ export interface IDashboardStats {
         month: number;
         year: number;
         total: number;
+        growth?: number; // Added for trend display
     };
     orders: {
         today: number;
@@ -18,6 +21,8 @@ export interface IDashboardStats {
         processing: number;
         completed: number;
         cancelled: number;
+        total?: number; // Added for total orders count
+        growth?: number; // Added for trend display
     };
     products: {
         total: number;
@@ -29,6 +34,7 @@ export interface IDashboardStats {
         total: number;
         new: number;
         active: number;
+        growth?: number;
     };
     topProducts: Array<{
         _id: string;
@@ -45,7 +51,6 @@ export interface IDashboardStats {
         createdAt: string;
     }>;
 }
-
 export interface ISalesReport {
     labels: string[];
     data: number[];
@@ -56,14 +61,28 @@ export interface ISalesReport {
 export const adminApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get dashboard stats
-        getDashboardStats: builder.query<IDashboardStats, { period?: 'day' | 'week' | 'month' }>({
+        getDashboardStats: builder.query<IDashboardStats, { period?: 'today' | 'week' | 'month' | 'year' }>({
             query: (params) => ({
                 url: '/admin/dashboard/stats',
                 params,
             }),
             providesTags: ['Dashboard'],
         }),
+        getRecentOrders: builder.query<IApiResponse<IOrder[]>, { limit?: number }>({
+            query: (params) => ({
+                url: '/admin/orders/recent',
+                params
+            }),
+            providesTags: ['Orders']
+        }),
 
+        getLowStockProducts: builder.query<IApiResponse<IProduct[]>, { threshold?: number }>({
+            query: (params) => ({
+                url: '/admin/products/low-stock',
+                params
+            }),
+            providesTags: ['Products']
+        }),
         // Get sales report
         getSalesReport: builder.query<
             ISalesReport,
@@ -106,4 +125,6 @@ export const {
     useGetInventoryReportQuery,
     useGetCustomerReportQuery,
     useExportDataMutation,
+    useGetRecentOrdersQuery,
+    useGetLowStockProductsQuery
 } = adminApi;

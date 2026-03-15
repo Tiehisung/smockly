@@ -11,7 +11,7 @@ import {
   ChartBarIcon,
   Cog6ToothIcon,
   Bars3Icon,
-  XMarkIcon,
+  XMarkIcon,HomeModernIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
@@ -23,6 +23,7 @@ const navigation = [
   { name: "Coupons", to: "/admin/coupons", icon: TicketIcon },
   { name: "Reports", to: "/admin/reports", icon: ChartBarIcon },
   { name: "Settings", to: "/admin/settings", icon: Cog6ToothIcon },
+  { name: "Shop View", to: "/", icon: HomeModernIcon },
 ];
 
 export function AdminLayout() {

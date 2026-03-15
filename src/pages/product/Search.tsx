@@ -1,10 +1,10 @@
 // src/pages/SearchResults.tsx
 import { useSearchParams } from "react-router-dom";
- 
+
 import { useState } from "react";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
-import { ProductCard } from "../../components/products/ProductCard";
-import { Pagination } from "../../components/ui/Pagination";
+import { ProductCard } from "./ProductCard";
+import { Pagination } from "../../components/Pagination";
 import { useSearchProductsQuery } from "../../store/api/productsApi";
 
 export function SearchResults() {

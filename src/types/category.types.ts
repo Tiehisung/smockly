@@ -1,10 +1,9 @@
 import type { IBaseDocument } from "./base.types";
 
- 
 
- 
+
+
 export interface ICategory extends IBaseDocument {
-    productCount: number;
     name: string;
     slug: string;
     description?: string;
@@ -37,6 +36,8 @@ export interface ICategory extends IBaseDocument {
 
     // Metadata
     meta: ICategoryMeta;
+
+    productCount?: number;
 }
 
 export interface ICategoryAncestor {
@@ -49,7 +50,7 @@ export interface ICategoryAncestor {
 export interface ICategorySEO {
     title: string;
     description: string;
-    keywords: string[];
+    keywords: string; //csv
     ogImage?: string;
 }
 
@@ -70,6 +71,10 @@ export interface ICategoryStats {
 }
 
 export interface ICategoryMeta {
-    tags: string[];
+    tags: string;//csv
     notes?: string;
+}
+
+export interface ICategoryTreeNode extends ICategory {
+    children: ICategoryTreeNode[];
 }

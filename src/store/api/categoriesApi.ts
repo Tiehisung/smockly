@@ -1,7 +1,7 @@
 // src/store/api/categoriesApi.ts
 
 import { baseApi } from "./baseApi";
-import type { ICategory } from "../../types/category.types";
+import type { ICategory, ICategoryTreeNode } from "../../types/category.types";
 import { TAG_TYPES } from "./tags";
 import type { IApiResponse } from "../../types";
 
@@ -17,24 +17,24 @@ export const categoriesApi = baseApi.injectEndpoints({
         }),
 
         // Get category by slug
-        getCategoryBySlug: builder.query<ICategory, string>({
+        getCategoryBySlug: builder.query<IApiResponse<ICategory>, string>({
             query: (slug) => `/categories/${slug}`,
             providesTags: (result, _error, slug) => [
                 { type: TAG_TYPES.CATEGORY, id: slug },
-                { type: TAG_TYPES.CATEGORY, id: result?._id },
+                { type: TAG_TYPES.CATEGORY, id: result?.data?._id },
             ],
         }),
 
         // Get category tree (hierarchy)
-        getCategoryTree: builder.query<ICategory[], void>({
+        getCategoryTree: builder.query<IApiResponse<ICategoryTreeNode[]>, void>({
             query: () => '/categories/tree',
             providesTags: [{ type: TAG_TYPES.CATEGORIES, id: 'TREE' }],
         }),
 
         // Admin: Create category
-        createCategory: builder.mutation<ICategory, FormData>({
+        createCategory: builder.mutation<IApiResponse<ICategory>, FormData>({
             query: (categoryData) => ({
-                url: '/admin/categories',
+                url: '/categories',
                 method: 'POST',
                 body: categoryData,
             }),
@@ -45,23 +45,23 @@ export const categoriesApi = baseApi.injectEndpoints({
         }),
 
         // Admin: Update category
-        updateCategory: builder.mutation<ICategory, { id: string; data: FormData }>({
-            query: ({ id, data }) => ({
-                url: `/admin/categories/${id}`,
+        updateCategory: builder.mutation<IApiResponse<ICategory>, { _id: string; formData: FormData }>({
+            query: ({ _id, formData }) => ({
+                url: `/categories/${_id}`,
                 method: 'PUT',
-                body: data,
+                body: formData,
             }),
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: TAG_TYPES.CATEGORY, id },
+            invalidatesTags: (_result, _error, { _id }) => [
+                { type: TAG_TYPES.CATEGORY, id: _id },
                 { type: TAG_TYPES.CATEGORIES, id: 'LIST' },
                 { type: TAG_TYPES.CATEGORIES, id: 'TREE' },
             ],
         }),
 
         // Admin: Delete category
-        deleteCategory: builder.mutation<{ message: string }, string>({
+        deleteCategory: builder.mutation<IApiResponse<ICategory>, string>({
             query: (id) => ({
-                url: `/admin/categories/${id}`,
+                url: `/categories/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: [
@@ -71,9 +71,9 @@ export const categoriesApi = baseApi.injectEndpoints({
         }),
 
         // Admin: Reorder categories
-        reorderCategories: builder.mutation<{ success: boolean }, { id: string; order: number }[]>({
+        reorderCategories: builder.mutation<IApiResponse, { id: string; order: number }[]>({
             query: (categories) => ({
-                url: '/admin/categories/reorder',
+                url: '/categories/reorder',
                 method: 'PATCH',
                 body: { categories },
             }),
