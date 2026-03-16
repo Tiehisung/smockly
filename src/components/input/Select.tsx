@@ -1,0 +1,43 @@
+// src/components/ui/Select.tsx
+import React from "react";
+import { cn } from "../../utils/cn";
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  error?: string;
+  options: Array<{ value: string; label: string }>;
+  placeholder?: string;
+}
+
+export const SELECT = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ className, label, error, options, placeholder, ...props }, ref) => {
+    return (
+      <div className="w-full">
+        {label && (
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {label}
+          </label>
+        )}
+        <select
+          ref={ref}
+          className={cn(
+            " relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm outline-none transition-colors bg-white",
+            error ? "border-red-500" : "border-gray-300",
+            className,
+          )}
+          {...props}
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      </div>
+    );
+  },
+);
+
+SELECT.displayName = "Select";

@@ -29,7 +29,7 @@ export function SignupPage() {
         email,
         password,
       });
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -45,7 +45,10 @@ export function SignupPage() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6 border border-gray-200 p-4" onSubmit={handleSubmit}>
+        <form
+          className="mt-8 space-y-6 border border-gray-200 p-4"
+          onSubmit={handleSubmit}
+        >
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">{error}</p>

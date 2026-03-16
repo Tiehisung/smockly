@@ -6,7 +6,7 @@ import { ProfilePicture } from "../components/ProfilePicture";
 import { DeleteAccount } from "../components/auth/DeleteAccount";
 
 export function Profile() {
-  const { user } = useAuth();
+  const { user, logout,   } = useAuth();
   const dispatch = useAppDispatch();
   const preferences = useAppSelector((state) => state.user.preferences);
 
@@ -129,7 +129,8 @@ export function Profile() {
         </div>
       </div>
 
-      <div className="my-8">
+      <div className="my-8 grid md:grid-cols-2 gap-2">
+        <button onClick={() => logout()} className="text-red-600">Logout</button>
         <DeleteAccount />
       </div>
     </div>

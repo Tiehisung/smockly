@@ -6,13 +6,14 @@ import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist
 // Import your reducers
 import userReducer from './slices/userSlice';
 import appReducer from './slices/appSlice';
-import { baseApi } from '../services/base-api';
+import { baseApi } from './api/baseApi';
+
 
 // Configuration for which reducers to persist
 const persistConfig = {
     key: 'root', // key in localStorage
     storage, // using localStorage
-    whitelist: ['user', 'app'], // reducers you want to persist
+    whitelist: ['user', 'app', 'cart'], // reducers you want to persist
     blacklist: [baseApi.reducerPath] // Don't persist API cache
 };
 
@@ -36,6 +37,7 @@ export const store = configureStore({
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
         }).concat(baseApi.middleware),
+    devTools: import.meta.env.NODE_ENV !== 'production',
 });
 
 // Create persistor

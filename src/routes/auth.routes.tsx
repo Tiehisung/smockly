@@ -1,12 +1,12 @@
 import type { RouteObject } from "react-router-dom";
-import { PublicRoute } from "../components/layout/PublicRoute";
 import { LoginPage } from "../pages/auth/Login";
 import { SignupPage } from "../pages/auth/Signup";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
+import { AuthLayout } from "../components/layout/AuthLayout";
 
 export const authRoutes: RouteObject = {
-  path: "auth",
-  element: <PublicRoute />,
+  path: "/auth",
+  element: <AuthLayout />,
   children: [
     {
       path: "login",

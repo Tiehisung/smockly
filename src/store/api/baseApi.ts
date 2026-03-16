@@ -1,8 +1,9 @@
-// services/api.ts
+// store/api/baseApi.ts
 
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { auth } from "../configs/firebase";
+import { auth } from "../../configs/firebase";
+import { TAG_TYPES } from "./tags";
 
 export const baseApi = createApi({
     reducerPath: "api",
@@ -17,7 +18,7 @@ export const baseApi = createApi({
             return headers;
         },
     }),
-    tagTypes: ['Auth', "User", 'Users', 'Notifications','Settings',],
+    tagTypes: Object.values(TAG_TYPES),
 
     endpoints: () => ({}),
 
