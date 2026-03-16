@@ -83,8 +83,8 @@ export const useCart = () => {
     }, [removeCouponMutation]);
 
     const itemCount = useMemo(() => cartData?.itemCount || 0, [cart]);
-    const subtotal = useMemo(() => cartData?.subtotal?.amount || 0, [cart]);
-    const total = useMemo(() => cartData?.total?.amount || 0, [cart]);
+    const subtotal = useMemo(() => cartData?.subtotal || 0, [cart]);
+    const total = useMemo(() => cartData?.total || 0, [cart]);
 
     return {
         cart,

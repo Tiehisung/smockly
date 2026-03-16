@@ -19,7 +19,6 @@ import { INPUT } from "../../../components/input/Input";
 import { SELECT } from "../../../components/input/Select";
 import { TEXTAREA } from "../../../components/input/TextArea";
 import { CHECKBOX } from "../../../components/input/Checkbox";
-import { allCategories } from "../../../data/categories";
 import { smartToast } from "../../../lib/toast";
 import FileInput from "../../../components/input/File";
 
@@ -259,11 +258,10 @@ export function AdminProductForm() {
   }
 
   // Prepare category options for Select component
-  console.log({ categories });
-  const normalCategories = [...(categories?.data || []), ...allCategories];
+ 
   const categoryOptions = [
     { value: "", label: "Select category" },
-    ...(normalCategories?.map((cat) => ({
+    ...(categories?.data?.map((cat) => ({
       value: cat.slug,
       label: cat.name,
     })) || []),

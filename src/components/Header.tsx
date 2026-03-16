@@ -42,9 +42,7 @@ export function Header() {
               >
                 New Arrivals
               </Link>
-              <Link to="/sale" className="text-gray-700 hover:text-blue-600">
-                Sale
-              </Link>
+             
             </div>
 
             {/* Icons */}

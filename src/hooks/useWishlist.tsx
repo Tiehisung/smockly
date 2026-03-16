@@ -1,4 +1,4 @@
-// src/hooks/useWishlist.ts
+// src/hooks/usewishlistData.ts
 import { useCallback } from "react";
 import {
   useGetWishlistQuery,
@@ -17,13 +17,15 @@ export const useWishlist = () => {
   const navigate = useNavigate();
 
   const {
-    data: wishlist = [],
+    data: wishlist,
     isLoading,
     refetch,
     error,
   } = useGetWishlistQuery(undefined, {
     skip: !user, // Skip if not logged in
   });
+
+  const wishlistData = wishlist?.data || [];
 
   const [addToWishlistMutation] = useAddToWishlistMutation();
   const [removeFromWishlistMutation] = useRemoveFromWishlistMutation();
@@ -48,9 +50,9 @@ export const useWishlist = () => {
   const isInWishlistSync = useCallback(
     (productId: string): boolean => {
       if (!user) return false;
-      return wishlist.some((item) => item._id === productId);
+      return wishlistData.some((item) => item._id === productId);
     },
-    [user, wishlist],
+    [user, wishlistData],
   );
 
   const addToWishlist = useCallback(
@@ -140,7 +142,7 @@ export const useWishlist = () => {
     wishlist,
     isLoading,
     error,
-    itemCount: wishlist.length,
+    itemCount: wishlistData.length,
 
     // Sync check (immediate, uses cached data)
     isInWishlist: isInWishlistSync,

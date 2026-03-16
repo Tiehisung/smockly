@@ -14,11 +14,9 @@ export interface IAuthUser {
 export interface ISignUpData {
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
     displayName?: string;
     phone?: string;
-    acceptTerms: boolean;
+    acceptTerms?: boolean;
     subscribeNewsletter?: boolean;
 }
 

@@ -7,7 +7,7 @@ import { ProductCard } from "../product/ProductCard";
 import { useGetCategoriesQuery } from "../../store/api/categoriesApi";
 import { useGetProductsQuery } from "../../store/api/productsApi";
 import type { EProductCategory } from "../../types/product.types";
-import { parentCategories } from "../../data/categories";
+ 
 
 export function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export function CategoriesPage() {
 
         {/* Category Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {(filteredCategories ?? parentCategories)?.map((category) => (
+          {filteredCategories?.map((category) => (
             <div
               key={category._id}
               className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"

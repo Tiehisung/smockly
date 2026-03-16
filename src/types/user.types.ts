@@ -1,7 +1,5 @@
  
 import type { IBaseDocument } from "./base.types";
-import type { IAddress } from "./shop.types";
-
  
 export enum EUserRole {
     ADMIN = 'admin',
@@ -19,39 +17,43 @@ export enum EUserStatus {
 
 // Main User Interface
 export interface IUser extends IBaseDocument {
-    // Auth
     firebaseUid: string;
     email: string;
-    emailVerified: boolean;
-
-    // Profile
-    profile: IUserProfile;
-
-    // Preferences
-    preferences: IUserPreferences;
-
-    // Role & Permissions
-    role: EUserRole;
-    permissions: string[];
-    status: EUserStatus;
-
-    // Addresses
-    addresses: IAddress[];
-
-    // Shopping
-    cart?: IUserCart;
-    wishlist: string[]; // Product IDs
-
-    // Stats
-    stats: IUserStats;
-
-    // Activity
-    lastLogin: string;
-    lastActive: string;
-    loginCount: number;
-
-    // Metadata
-    meta: IUserMeta;
+    displayName?: string;
+    photoURL?: string;
+    phone?: string;
+    role: EUserRole
+    isActive: boolean;
+    lastLogin: Date;
+    preferences: {
+        theme: 'light' | 'dark';
+        notifications: {
+            email: boolean;
+            push: boolean;
+            marketing: boolean;
+        };
+        newsletter: boolean;
+    };
+    stats: {
+        totalOrders: number;
+        totalSpent: number;
+        memberSince: Date;
+    };
+    addresses: Array<{
+        _id?: string;
+        type: 'shipping' | 'billing';
+        firstName: string;
+        lastName: string;
+        addressLine1: string;
+        addressLine2?: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+        phone: string;
+        isDefault: boolean;
+    }>;
+    wishlist: Array<string>;
 }
 
 export interface IUserProfile {

@@ -1,24 +1,27 @@
 // src/hooks/useCoupon.ts
 import { useCallback, useState } from 'react';
-import {  useLazyValidateCouponQuery } from '../store/api/couponsApi';
+import { useLazyValidateCouponQuery } from '../store/api/couponsApi';
 import { useCart } from './useCart';
 import toast from 'react-hot-toast';
 
 export const useCoupon = () => {
     const [validating, setValidating] = useState(false);
     const { cart, applyCoupon, removeCoupon } = useCart();
+
+    const cartData = cart?.data
+
     const [validateCoupon] = useLazyValidateCouponQuery();
 
-    const appliedCoupon = cart?.appliedCoupon;
+    const appliedCoupon = cartData?.appliedCoupon;
 
     const validateAndApply = useCallback(async (code: string) => {
-        if (!cart) return;
+        if (!cartData) return;
 
         setValidating(true);
         try {
             const result = await validateCoupon({
                 code,
-                subtotal: cart.subtotal.amount,
+                subtotal: cartData.subtotal,
             }).unwrap();
 
             if (result.valid && result.coupon) {
@@ -39,18 +42,17 @@ export const useCoupon = () => {
 
     const remove = useCallback(async () => {
         await removeCoupon();
-        toast.success('Coupon removed');
     }, [removeCoupon]);
 
     const getDiscountAmount = useCallback((): number => {
-        if (!cart || !cart.discount) return 0;
-        return cart.discount.amount;
+        if (!cartData || !cartData?.discount) return 0;
+        return cartData?.discount;
     }, [cart]);
 
     const getSavingsPercentage = useCallback((): number => {
-        if (!cart || !cart.discount || cart.subtotal.amount === 0) return 0;
-        return (cart.discount.amount / cart.subtotal.amount) * 100;
-    }, [cart]);
+        if (!cartData || !cartData.discount || cartData.subtotal === 0) return 0;
+        return (cartData.discount / cartData.subtotal) * 100;
+    }, [cartData]);
 
     return {
         appliedCoupon,

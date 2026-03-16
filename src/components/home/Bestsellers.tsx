@@ -3,12 +3,11 @@ import { useGetBestsellersQuery } from "../../store/api/productsApi";
 import { ProductCard } from "../../pages/product/ProductCard";
 import { LoadingSpinner } from "../common/LoadingSpinner";
 import { Link } from "react-router-dom";
-import { getBestsellers } from "../../data/shop";
 
 export function Bestsellers() {
-  const { data: products, isLoading } = useGetBestsellersQuery(4);
+  const { data: productsData, isLoading } = useGetBestsellersQuery(4);
 
-  const normalProducts = products?.data || getBestsellers();
+  const products = productsData?.data;
 
   if (isLoading) {
     return (
@@ -33,7 +32,7 @@ export function Bestsellers() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {normalProducts?.map((product) => (
+          {products?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

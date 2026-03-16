@@ -1,12 +1,13 @@
 // src/components/home/NewArrivalsSection.tsx
 import { Link } from "react-router-dom";
 import { ProductCard } from "../../pages/product/ProductCard";
-
 import { SparklesIcon } from "@heroicons/react/24/outline";
-import { getNewArrivals } from "../../data/shop";
+import { useGetNewArrivalsQuery } from "../../store/api/productsApi";
+import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export function NewArrivalsSection() {
-  const newArrivals = getNewArrivals(4);
+  const { data, isLoading } = useGetNewArrivalsQuery(4);
+  const products = data?.data;
 
   return (
     <section className="py-16 bg-linear-to-b from-white to-gray-50">
@@ -26,19 +27,23 @@ export function NewArrivalsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {newArrivals.map((product) => (
-            <div key={product._id} className="relative">
-              <div className="absolute top-2 left-2 z-10">
-                <span className="bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
-                  <SparklesIcon className="w-3 h-3 mr-1" />
-                  New
-                </span>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products?.map((product) => (
+              <div key={product._id} className="relative">
+                <div className="absolute top-2 left-2 z-10">
+                  <span className="bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
+                    <SparklesIcon className="w-3 h-3 mr-1" />
+                    New
+                  </span>
+                </div>
+                <ProductCard product={product} />
               </div>
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="text-center mt-10">
           <Link

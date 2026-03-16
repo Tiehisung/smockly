@@ -51,11 +51,7 @@ export function SearchResults() {
             </div>
 
             {data?.pagination && data.pagination.pages > 1 && (
-              <Pagination
-                currentPage={data.pagination.page}
-                totalPages={data.pagination.pages}
-                onPageChange={setPage}
-              />
+              <Pagination pagination={data.pagination} onPageChange={setPage} />
             )}
           </>
         )}

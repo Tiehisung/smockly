@@ -1,14 +1,15 @@
 // src/store/api/wishlistApi.ts
 
- 
+
+import type { IApiResponse } from "../../types";
 import type { IProduct } from "../../types/product.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
-  
+
 export const wishlistApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Get wishlist
-        getWishlist: builder.query<IProduct[], void>({
+        getWishlist: builder.query<IApiResponse<IProduct[]> & { count: number }, void>({
             query: () => '/wishlist',
             providesTags: [TAG_TYPES.WISHLIST],
         }),
@@ -46,8 +47,8 @@ export const wishlistApi = baseApi.injectEndpoints({
                 // Optimistic update
                 const patchResult = dispatch(
                     wishlistApi.util.updateQueryData('getWishlist', undefined, (draft) => {
-                        const index = draft.findIndex(p => p._id === productId);
-                        if (index !== -1) draft.splice(index, 1);
+                        const index = draft?.data?.findIndex(p => p._id === productId);
+                        if (index !== -1) draft?.data?.splice(index || 0, 1);
                     })
                 );
                 try {

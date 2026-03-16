@@ -51,7 +51,7 @@ export const useProducts = (initialFilters?: Partial<IProductFilters>) => {
     }, [setSearchParams]);
 
     return {
-        products: data?.items || [],
+        products: data?.data || [],
         pagination: data?.pagination,
         filters,
         isLoading,

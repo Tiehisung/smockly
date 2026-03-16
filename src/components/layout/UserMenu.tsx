@@ -19,7 +19,7 @@ export function UserMenu() {
   if (!user) {
     return (
       <button
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/auth/login")}
         className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         <UserIcon className="w-5 h-5" />

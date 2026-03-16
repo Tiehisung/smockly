@@ -237,16 +237,16 @@ export function AdminOrderDetails() {
                 <div className="flex items-start text-gray-600">
                   <MapPin className="w-4 h-4 mr-2 mt-0.5" />
                   <div>
-                    <p>{order.shipping?.address?.addressLine1}</p>
-                    {order.shipping?.address?.addressLine2 && (
-                      <p>{order.shipping.address.addressLine2}</p>
+                    <p>{order.shipping?.address}</p>
+                    {order.shipping?.address && (
+                      <p>{order.shipping.address}</p>
                     )}
                     <p>
-                      {order.shipping?.address?.city},{" "}
-                      {order.shipping?.address?.state}{" "}
-                      {order.shipping?.address?.postalCode}
+                      {order.shipping?.city},{" "}
+                      {order.shipping?.state}{" "}
+                      {order.shipping?.zipCode}
                     </p>
-                    <p>{order.shipping?.address?.country}</p>
+                    <p>{order.shipping?.country}</p>
                   </div>
                 </div>
               </div>

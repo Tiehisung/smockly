@@ -52,7 +52,7 @@ export interface IOrder extends IBaseDocument {
     // Items
     items: IOrderItem[];
 
-    // Status
+    // Status 
     status: EOrderStatus;
     paymentStatus: EPaymentStatus;
     shippingStatus: EShippingStatus;
@@ -80,7 +80,13 @@ export interface IOrder extends IBaseDocument {
     notes?: string;
     tags?: string[];
     meta: IOrderMeta;
-
+    firebaseUid: string;
+    subtotal: number;
+    tax: number;
+    shippingCost: number;
+    discount: number;
+    total: number;
+    trackingNumber?: string;
 }
 
 export interface IOrderItem {
@@ -107,12 +113,17 @@ export interface IOrderShipping {
     lastName: string;
     email: string;
     firstName: string;
-    address: IAddress;
+    address: string;
     method: IOrderShippingMethod;
     trackingNumber?: string;
     carrier?: string;
     shippedAt?: string;
-    deliveredAt?: string;
+    deliveredAt?: string; 
+    apartment?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
 }
 
 export interface IOrderShippingMethod {
@@ -130,6 +141,7 @@ export interface IPaymentDetails {
     paymentIntent?: string;
     paymentMethodDetails?: Record<string, any>;
 }
+
 
 export interface IOrderFinancials {
     subtotal: IPrice;

@@ -2,13 +2,11 @@
 import { useGetFeaturedProductsQuery } from "../../store/api/productsApi";
 import { ProductCard } from "../../pages/product/ProductCard";
 import { LoadingSpinner } from "../common/LoadingSpinner";
-import { allProducts } from "../../data/products";
 
 export function FeaturedProducts() {
   const { data: products, isLoading } = useGetFeaturedProductsQuery(8);
 
-  const normalProducts =
-    products?.data || allProducts.filter((p) => p.featured)?.slice(0, 4);
+  const featProducts = products?.data?.slice(0, 4);
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -19,7 +17,7 @@ export function FeaturedProducts() {
           Featured Products
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {normalProducts?.map((product) => (
+          {featProducts?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

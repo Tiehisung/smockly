@@ -36,12 +36,15 @@ export interface IPaginatedResponse<T> {
     };
 }
 
-export interface IQueryParams {
+export interface IQueryParams extends IBaseQueryParams {
+    [k: string]: unknown
+}
+export interface IBaseQueryParams {
     page?: number;
     limit?: number;
     search?: string;
+    status?: string
     role?: string,
-    [k: string]: unknown
 }
 
 export interface ISelectOptionLV {

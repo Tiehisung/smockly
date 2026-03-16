@@ -1,7 +1,7 @@
 // src/components/ui/Popover.tsx
 import { Fragment, type ReactNode } from "react";
 import { Popover as HeadlessPopover, Transition } from "@headlessui/react";
- 
+
 interface PopoverProps {
   trigger: ReactNode;
   children: ReactNode;
@@ -35,7 +35,7 @@ export function Popover({
 }: PopoverProps) {
   return (
     <HeadlessPopover className={`relative ${className}`}>
-      {({ open }) => (
+      {({}) => (
         <>
           <HeadlessPopover.Button as={Fragment}>
             {trigger}

@@ -102,7 +102,7 @@ export const cartApi = baseApi.injectEndpoints({
         // Move to cart from saved
         moveToCart: builder.mutation<IApiResponse<ICart>, string>({
             query: (itemId) => ({
-                url: `/cart/items/${itemId}/move-to-cart`,
+                url: `/wishlist/${itemId}/move-to-cart`,
                 method: 'POST',
             }),
             invalidatesTags: [TAG_TYPES.CART],

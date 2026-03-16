@@ -7,17 +7,23 @@ import { Pagination } from "../components/Pagination";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import type { IPagination } from "../types";
-import { allCategories } from "../data/categories";
-import { getNewArrivals } from "../data/shop";
+import { useGetCategoriesQuery } from "../store/api/categoriesApi";
+import { useGetNewArrivalsQuery } from "../store/api/productsApi";
 
 export function NewArrivals() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [loading, setLoading] = useState(true);
+ 
   const [newArrivals, setNewArrivals] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<string>("all");
+
+  const { data: categories, isLoading: categoriesLoading } =
+    useGetCategoriesQuery({});
+
+  const { data: newArrivalsData, isLoading: isLoadingProducts } =
+    useGetNewArrivalsQuery(50);
 
   // Pagination state
   const page = Number(searchParams.get("page")) || 1;
@@ -44,10 +50,8 @@ export function NewArrivals() {
 
   // Load new arrivals
   useEffect(() => {
-    setLoading(true);
-
     // Get new arrivals from dummy data
-    let products = getNewArrivals(50); // Get up to 50 new arrivals
+    let products = newArrivalsData?.data || [];
 
     // Apply time filter
     const now = new Date();
@@ -72,8 +76,7 @@ export function NewArrivals() {
 
     setNewArrivals(products);
     setFilteredProducts(products);
-    setLoading(false);
-  }, [timeFilter]);
+  }, [timeFilter, newArrivalsData]);
 
   // Apply category filter
   useEffect(() => {
@@ -133,6 +136,8 @@ export function NewArrivals() {
     setSearchParams(params);
   };
 
+  if (categoriesLoading) return <LoadingSpinner />;
+
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -176,7 +181,9 @@ export function NewArrivals() {
                 >
                   All
                 </button>
-                {allCategories.map((category) => (
+
+                {}
+                {categories?.data?.map((category) => (
                   <button
                     key={category._id}
                     onClick={() => setSelectedCategory(category.slug)}
@@ -233,7 +240,7 @@ export function NewArrivals() {
         </div>
 
         {/* Products Grid */}
-        {loading ? (
+        {isLoadingProducts ? (
           <LoadingSpinner />
         ) : displayedProducts.length === 0 ? (
           <div className="text-center py-16">
@@ -245,7 +252,7 @@ export function NewArrivals() {
             </h3>
             <p className="text-gray-500 mb-6">
               {selectedCategory !== "all"
-                ? `We don't have any new ${allCategories.find((c) => c.slug === selectedCategory)?.name} at the moment.`
+                ? `We don't have any new ${categories?.data?.find((c) => c.slug === selectedCategory)?.name} at the moment.`
                 : "Check back soon for new products!"}
             </p>
             <div className="space-x-4">

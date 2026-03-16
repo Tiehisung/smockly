@@ -20,7 +20,7 @@ export function Auth() {
   const [isLogin, setIsLogin] = useState(true);
 
   // Get auth context
-  const { user, loading: authLoading, } = useAuth();
+  const { user, isLoading: authLoading, } = useAuth();
   console.log(authLoading);
 
   // Get Redux state and dispatch
@@ -130,7 +130,7 @@ export function Auth() {
   // Show loading spinner while checking auth state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center">
           <div className="flex justify-center mb-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -144,7 +144,7 @@ export function Auth() {
   // Welcome screen when user is logged in
   if (user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center">
             {/* Success Icon */}
@@ -202,7 +202,7 @@ export function Auth() {
 
   // Login/Signup form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -260,7 +260,7 @@ export function Auth() {
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <svg
                     className="h-5 w-5 text-red-400"
                     fill="none"

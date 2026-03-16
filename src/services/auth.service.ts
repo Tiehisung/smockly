@@ -12,7 +12,7 @@ import {
     getRedirectResult,
 } from "firebase/auth";
 
-import { type SignUpData, type SignInData, type AuthUser, mapFirebaseUser } from "../types/auth.types";
+import { mapFirebaseUser, type IAuthUser, type ISignInData, type ISignUpData } from "../types/auth.types";
 import { auth } from "../configs/firebase";
 import { apiService } from "./api.service";
 
@@ -31,7 +31,7 @@ class AuthService {
             throw new Error(error.message);
         }
     }
-    
+
     // GitHub Sign In
     async signInWithGithub() {
         try {
@@ -63,7 +63,7 @@ class AuthService {
     }
 
     /**Credentials Signup*/
-    async signUp({ email, password, displayName }: SignUpData): Promise<AuthUser> {
+    async signUp({ email, password, displayName }: ISignUpData): Promise<IAuthUser> {
         try {
             const userCredential: UserCredential = await createUserWithEmailAndPassword(
                 auth,
@@ -90,7 +90,7 @@ class AuthService {
         }
     }
 
-    async signIn({ email, password }: SignInData): Promise<AuthUser> {
+    async signIn({ email, password }: ISignInData): Promise<IAuthUser> {
         try {
             const userCredential: UserCredential = await signInWithEmailAndPassword(
                 auth,
@@ -114,12 +114,12 @@ class AuthService {
         await signOut(auth);
     }
 
-    getCurrentUser(): AuthUser | null {
+    getCurrentUser(): IAuthUser | null {
         return mapFirebaseUser(auth.currentUser);
     }
 
     // Save user to MongoDB
-     async saveUserToDatabase(user: AuthUser): Promise<void> {
+    async saveUserToDatabase(user: IAuthUser): Promise<void> {
         try {
             console.log('saving')
             const response = await apiService.post('/users/create', {
@@ -142,7 +142,7 @@ class AuthService {
     }
 
     // Update last login
-     async updateUserLastLogin(uid: string): Promise<void> {
+    async updateUserLastLogin(uid: string): Promise<void> {
         try {
             await apiService.post('/users/last-login', { uid });
         } catch (error) {

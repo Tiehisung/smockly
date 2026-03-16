@@ -150,22 +150,6 @@ export function UsersPage() {
     setPage(1);
   };
 
-  // Check if current user is admin
-  // if (!currentUser || currentUser?.role !== "admin") {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-  //           Access Denied
-  //         </h1>
-  //         <p className="text-gray-600">
-  //           You don't have permission to view this page.
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   if (usersLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -451,7 +435,7 @@ export function UsersPage() {
                                   : "bg-gray-100 text-gray-800"
                             } ${user._id === currentUser?.uid ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
-                            <option value={EUserRole.GUEST}>Guest</option>
+                            <option value={EUserRole.MANAGER}>Manager</option>
                             <option value={EUserRole.CUSTOMER}>Customer</option>
                             <option value={EUserRole.ADMIN}>Admin</option>
                             <option value={EUserRole.SUPER_ADMIN}>
@@ -485,16 +469,7 @@ export function UsersPage() {
                           addSuffix: true,
                         })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex space-x-2">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                            Posts: {user.stats?.postsCount || 0}
-                          </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                            Followers: {user.stats?.followersCount || 0}
-                          </span>
-                        </div>
-                      </td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-3">
                           <button

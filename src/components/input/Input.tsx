@@ -30,7 +30,7 @@ export const INPUT = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={cn(
-              "w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors",
+              "appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm outline-none transition-colors",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error ? "border-red-500" : "border-gray-300",

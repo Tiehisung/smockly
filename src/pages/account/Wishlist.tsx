@@ -1,4 +1,4 @@
-// src/pages/account/Wishlist.tsx
+// src/pages/account/WishlistwishlistData?.tsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../../hooks/useWishlist";
@@ -30,6 +30,8 @@ export function Wishlist() {
     moveToCart,
   } = useWishlist();
 
+  const wishlistData = wishlist?.data || [];
+
   const { addToCart } = useCart();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [shareDrawerOpen, setShareDrawerOpen] = useState(false);
@@ -37,10 +39,10 @@ export function Wishlist() {
 
   // Handle select all items
   const handleSelectAll = () => {
-    if (selectedItems.length === wishlist.length) {
+    if (selectedItems.length === wishlistData?.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(wishlist.map((item) => item._id));
+      setSelectedItems(wishlistData?.map((item) => item._id));
     }
   };
 
@@ -56,7 +58,7 @@ export function Wishlist() {
   // Handle add selected to cart
   const handleAddSelectedToCart = async () => {
     for (const productId of selectedItems) {
-      const product = wishlist.find((p) => p._id === productId);
+      const product = wishlistData?.find((p) => p._id === productId);
       if (product) {
         await addToCart({ productId, quantity: 1 });
       }
@@ -120,7 +122,7 @@ export function Wishlist() {
               <Button variant="outline" size="sm" onClick={handleShare}>
                 <ShareIcon className="w-4 h-4" /> Share
               </Button>
-              {wishlist.length > 0 && (
+              {wishlistData?.length > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -138,13 +140,13 @@ export function Wishlist() {
         </div>
 
         {/* Bulk Actions */}
-        {wishlist.length > 1 && (
+        {wishlistData?.length > 1 && (
           <div className="bg-white rounded-lg shadow-sm p-4 mb-6 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  checked={selectedItems.length === wishlist.length}
+                  checked={selectedItems.length === wishlistData?.length}
                   onChange={handleSelectAll}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
@@ -176,7 +178,7 @@ export function Wishlist() {
         )}
 
         {/* Wishlist Grid */}
-        {wishlist.length === 0 ? (
+        {wishlistData?.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-pink-100 rounded-full mb-6">
               <HeartIcon className="w-10 h-10 text-pink-600" />
@@ -198,7 +200,7 @@ export function Wishlist() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {wishlist.map((product) => (
+            {wishlistData?.map((product) => (
               <div key={product._id} className="relative group">
                 {/* Selection Checkbox */}
                 <div className="absolute top-2 left-2 z-10">
@@ -275,7 +277,7 @@ export function Wishlist() {
           </p>
 
           <div className="space-y-4 grid">
-            <Button onClick={copyShareLink} >
+            <Button onClick={copyShareLink}>
               <ShareIcon className="w-5 h-5" /> Copy Link
             </Button>
 

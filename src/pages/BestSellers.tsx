@@ -3,41 +3,23 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ProductCard } from "./product/ProductCard";
 import { ProductSort } from "./product/ProductSort";
-import { Pagination } from "../components/Pagination";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { FireIcon, ChartBarIcon } from "@heroicons/react/24/outline";
-import type { IPagination } from "../types";
-import { allCategories } from "../data/categories";
-import { getBestsellers } from "../data/shop";
 import { useGetBestsellersQuery } from "../store/api/productsApi";
-import { CurrencyIcon, StarIcon } from "../assets/svg";
+import { useGetCategoriesQuery } from "../store/api/categoriesApi";
+import type { IProduct } from "../types/product.types";
+import { Pagination } from "../components/Pagination";
 
 export function Bestsellers() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [loading, setLoading] = useState(true);
-  const [bestsellers, setBestsellers] = useState<any[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
+
+  const [bestsellers, setBestsellers] = useState<IProduct[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<IProduct[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [showFilters, setShowFilters] = useState(false);
-
-  // Pagination
-  const page = Number(searchParams.get("page")) || 1;
-  const sortBy = searchParams.get("sort") || "popular";
-  const itemsPerPage = 12;
-
-  // Pagination info
-  const [paginationInfo, setPaginationInfo] = useState<Partial<IPagination>>({
-    page: 1,
-    pages: 1,
-    total: 0,
-    limit: itemsPerPage,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  });
-
-  // Stats for bestsellers
+  const [currentPage, setCurrentPage] = useState(1);
   const [stats, setStats] = useState({
     totalSold: 0,
     topCategory: "",
@@ -45,46 +27,63 @@ export function Bestsellers() {
     priceRange: { min: 0, max: 0 },
   });
 
-  const { data: products } = useGetBestsellersQuery(4);
+  const itemsPerPage = 12;
+  const sortBy = searchParams.get("sort") || "popular";
 
-  // Load bestsellers
+  const { data: productsData, isLoading: isLoadingProducts } =
+    useGetBestsellersQuery(50);
+
+  const { data: categoriesData } = useGetCategoriesQuery({});
+
+  // Extract the actual data arrays from the API response
+  const products = productsData?.data || [];
+  const categories = categoriesData?.data || [];
+
+  // Load bestsellers and calculate stats
   useEffect(() => {
-    setLoading(true);
+    if (products.length > 0) {
+      // Calculate stats
+      const totalSold = products.reduce(
+        (sum, p) => sum + (p.meta?.purchases || 0),
+        0,
+      );
 
-    const normalProducts = products || getBestsellers();
-    // Calculate stats
-    const totalSold = normalProducts.reduce(
-      (sum, p) => sum + (p.meta?.purchases || 0),
-      0,
-    );
-    const categoryCounts = normalProducts.reduce((acc: any, p) => {
-      acc[p.category] = (acc[p.category] || 0) + 1;
-      return acc;
-    }, {});
-    const topCategory = Object.keys(categoryCounts).sort(
-      (a, b) => categoryCounts[b] - categoryCounts[a],
-    )[0];
+      const categoryCounts = products.reduce(
+        (acc: Record<string, number>, p) => {
+          acc[p.category] = (acc[p.category] || 0) + 1;
+          return acc;
+        },
+        {},
+      );
 
-    const avgRating =
-      normalProducts?.reduce((sum, p) => sum + p.ratings.average, 0) /
-      normalProducts?.length;
-    const prices = normalProducts.map((p) => p.price.amount);
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
+      const topCategorySlug = Object.keys(categoryCounts).sort(
+        (a, b) => categoryCounts[b] - categoryCounts[a],
+      )[0];
 
-    setStats({
-      totalSold,
-      topCategory:
-        allCategories.find((c) => c.slug === topCategory)?.name || topCategory,
-      averageRating: Number(avgRating.toFixed(1)),
-      priceRange: { min: minPrice, max: maxPrice },
-    });
+      const topCategory =
+        categories.find((c) => c.slug === topCategorySlug)?.name ||
+        topCategorySlug;
 
-    setBestsellers(normalProducts);
-    setFilteredProducts(normalProducts);
-    setPriceRange([minPrice, maxPrice]);
-    setLoading(false);
-  }, []);
+      const avgRating =
+        products.reduce((sum, p) => sum + (p.ratings?.average || 0), 0) /
+        (products.length || 1);
+
+      const prices = products.map((p) => p.price.amount);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      setStats({
+        totalSold,
+        topCategory,
+        averageRating: Number(avgRating.toFixed(1)),
+        priceRange: { min: minPrice, max: maxPrice },
+      });
+
+      setBestsellers(products);
+      setFilteredProducts(products);
+      setPriceRange([minPrice, maxPrice]);
+    }
+  }, [products, categories]);
 
   // Apply category filter and sorting
   useEffect(() => {
@@ -103,28 +102,17 @@ export function Bestsellers() {
     filtered = sortProducts(filtered, sortBy);
 
     setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [selectedCategory, sortBy, priceRange, bestsellers]);
 
-  // Update pagination and displayed products
+  // Update displayed products based on pagination
   useEffect(() => {
-    const total = filteredProducts.length;
-    const pages = Math.ceil(total / itemsPerPage);
-    const start = (page - 1) * itemsPerPage;
+    const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-
-    setPaginationInfo({
-      page,
-      pages,
-      total,
-      limit: itemsPerPage,
-      hasNextPage: page < pages,
-      hasPreviousPage: page > 1,
-    });
-
     setDisplayedProducts(filteredProducts.slice(start, end));
-  }, [filteredProducts, page, itemsPerPage]);
+  }, [filteredProducts, currentPage]);
 
-  const sortProducts = (products: any[], sortType: string) => {
+  const sortProducts = (products: IProduct[], sortType: string) => {
     switch (sortType) {
       case "price_asc":
         return [...products].sort((a, b) => a.price.amount - b.price.amount);
@@ -136,7 +124,7 @@ export function Bestsellers() {
         return [...products].sort((a, b) => b.name.localeCompare(a.name));
       case "rating":
         return [...products].sort(
-          (a, b) => b.ratings.average - a.ratings.average,
+          (a, b) => (b.ratings?.average || 0) - (a.ratings?.average || 0),
         );
       case "popular":
       default:
@@ -146,10 +134,8 @@ export function Bestsellers() {
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    setSearchParams(params);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -176,6 +162,8 @@ export function Bestsellers() {
     setSearchParams(params);
   };
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -198,7 +186,7 @@ export function Bestsellers() {
       </div>
 
       {/* Stats Section */}
-      {!loading && (
+      {!isLoadingProducts && bestsellers.length > 0 && (
         <div className="border-b border-gray-200 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -212,20 +200,37 @@ export function Bestsellers() {
               <div className="bg-white rounded-lg p-6 text-center shadow-sm">
                 <FireIcon className="h-8 w-8 text-orange-600 mx-auto mb-3" />
                 <p className="text-2xl font-bold text-gray-900">
-                  {stats.topCategory}
+                  {stats.topCategory || "Various"}
                 </p>
                 <p className="text-sm text-gray-600">Top Category</p>
               </div>
               <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-                <StarIcon className="h-8 w-8 text-orange-600 mx-auto mb-3" />
-
+                <svg
+                  className="h-8 w-8 text-orange-600 mx-auto mb-3"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
                 <p className="text-2xl font-bold text-gray-900">
                   {stats.averageRating}
                 </p>
                 <p className="text-sm text-gray-600">Average Rating</p>
               </div>
               <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-                <CurrencyIcon className="h-8 w-8 text-orange-600 mx-auto mb-3" />
+                <svg
+                  className="h-8 w-8 text-orange-600 mx-auto mb-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
                 <p className="text-2xl font-bold text-gray-900">
                   ${stats.priceRange.min} - ${stats.priceRange.max}
                 </p>
@@ -271,7 +276,7 @@ export function Bestsellers() {
                 >
                   All
                 </button>
-                {allCategories.map((category) => {
+                {categories.map((category) => {
                   const count = bestsellers.filter(
                     (p) => p.category === category.slug,
                   ).length;
@@ -312,7 +317,7 @@ export function Bestsellers() {
                 >
                   All
                 </button>
-                {allCategories.map((category) => {
+                {categories.map((category) => {
                   const count = bestsellers.filter(
                     (p) => p.category === category.slug,
                   ).length;
@@ -381,35 +386,37 @@ export function Bestsellers() {
             <p className="text-sm text-gray-500">
               Showing{" "}
               <span className="font-medium">{displayedProducts.length}</span> of{" "}
-              <span className="font-medium">{paginationInfo.total || 0}</span>{" "}
+              <span className="font-medium">{filteredProducts.length}</span>{" "}
               bestsellers
             </p>
 
             {/* Price Range Filter (Desktop) */}
-            <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-300">
-              <span className="text-sm text-gray-500">Price:</span>
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) =>
-                  handlePriceChange(Number(e.target.value), priceRange[1])
-                }
-                min={stats.priceRange.min}
-                max={stats.priceRange.max}
-                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-              />
-              <span>-</span>
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  handlePriceChange(priceRange[0], Number(e.target.value))
-                }
-                min={stats.priceRange.min}
-                max={stats.priceRange.max}
-                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-              />
-            </div>
+            {bestsellers.length > 0 && (
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-gray-300">
+                <span className="text-sm text-gray-500">Price:</span>
+                <input
+                  type="number"
+                  value={priceRange[0]}
+                  onChange={(e) =>
+                    handlePriceChange(Number(e.target.value), priceRange[1])
+                  }
+                  min={stats.priceRange.min}
+                  max={stats.priceRange.max}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    handlePriceChange(priceRange[0], Number(e.target.value))
+                  }
+                  min={stats.priceRange.min}
+                  max={stats.priceRange.max}
+                  className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                />
+              </div>
+            )}
 
             {(selectedCategory !== "all" ||
               priceRange[0] > stats.priceRange.min ||
@@ -425,7 +432,7 @@ export function Bestsellers() {
         </div>
 
         {/* Products Grid */}
-        {loading ? (
+        {isLoadingProducts ? (
           <LoadingSpinner />
         ) : displayedProducts.length === 0 ? (
           <div className="text-center py-16">
@@ -437,7 +444,10 @@ export function Bestsellers() {
             </h3>
             <p className="text-gray-500 mb-6">
               {selectedCategory !== "all"
-                ? `We don't have any bestsellers in ${allCategories.find((c) => c.slug === selectedCategory)?.name} yet.`
+                ? `We don't have any bestsellers in ${
+                    categories.find((c) => c.slug === selectedCategory)?.name ||
+                    selectedCategory
+                  } yet.`
                 : "Check back soon for popular products!"}
             </p>
             <div className="space-x-4">
@@ -480,10 +490,10 @@ export function Bestsellers() {
                     </div>
                   )}
                   {/* Sold Count Badge */}
-                  {product.meta?.purchases > 50 && (
+                  {(product.meta?.purchases || 0) > 50 && (
                     <div className="absolute top-2 right-2 z-10">
                       <span className="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                        {product.meta.purchases}+ sold
+                        {product.meta?.purchases}+ sold
                       </span>
                     </div>
                   )}
@@ -493,10 +503,10 @@ export function Bestsellers() {
             </div>
 
             {/* Pagination */}
-            {paginationInfo.pages && paginationInfo.pages > 1 && (
+            {totalPages > 1 && (
               <Pagination
+                pagination={{ page: currentPage, pages: totalPages }}
                 onPageChange={handlePageChange}
-                pagination={paginationInfo}
               />
             )}
           </>

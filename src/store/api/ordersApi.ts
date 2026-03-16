@@ -1,13 +1,13 @@
 // src/store/api/ordersApi.ts
 
-import type { IPaginatedResponse } from "../../types";
+import type { IApiResponse, IBaseQueryParams, IPaginatedResponse,   } from "../../types";
 import type { ICreateOrderPayload, IOrder } from "../../types/order.types";
 import type { IProcessPaymentResponse, IPaymentVerificationPayload, IPaystackInitializeResponse, IPaystackInitializePayload, IPaystackVerificationResponse } from "../../types/payment.types";
 import { baseApi } from "./baseApi";
 import { TAG_TYPES } from "./tags";
 
 export const ordersApi = baseApi.injectEndpoints({
-    endpoints: (builder) => ({  
+    endpoints: (builder) => ({
         // Process payment after Paystack redirect
         processPayment: builder.mutation<IProcessPaymentResponse, IPaymentVerificationPayload>({
             query: (paymentData) => ({
@@ -33,9 +33,8 @@ export const ordersApi = baseApi.injectEndpoints({
         }),
 
         // Get user orders
-        getUserOrders: builder.query<
-            IPaginatedResponse<IOrder>['data'],
-            { page?: number; limit?: number; status?: string }
+        getUserOrders: builder.query<IApiResponse<IOrder[]>,
+            IBaseQueryParams
         >({
             query: (params) => ({
                 url: '/orders',
@@ -44,7 +43,7 @@ export const ordersApi = baseApi.injectEndpoints({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.items.map(({ _id }) => ({ type: TAG_TYPES.ORDERS, id: _id })),
+                        ...(result.data || [])?.map(({ _id }) => ({ type: TAG_TYPES.ORDERS, id: _id })),
                         { type: TAG_TYPES.ORDERS, id: 'LIST' },
                     ]
                     : [{ type: TAG_TYPES.ORDERS, id: 'LIST' }],
