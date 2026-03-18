@@ -1,6 +1,7 @@
- 
+
 import type { IBaseDocument } from "./base.types";
- 
+import type { IAddress } from "./shop.types";
+
 export enum EUserRole {
     ADMIN = 'admin',
     SUPER_ADMIN = 'super_admin',
@@ -8,11 +9,11 @@ export enum EUserRole {
     MODERATOR = 'moderator',
     CUSTOMER = 'customer',
 }
+
 export enum EUserStatus {
     ACTIVE = 'active',
     INACTIVE = 'inactive',
-    SUSPENDED = 'suspended',
-    BANNED = 'banned',
+    BLOCKED = 'blocked',
 }
 
 // Main User Interface
@@ -23,42 +24,29 @@ export interface IUser extends IBaseDocument {
     photoURL?: string;
     phone?: string;
     role: EUserRole
-    isActive: boolean;
+    status: EUserStatus;
     lastLogin: Date;
-    preferences: {
-        theme: 'light' | 'dark';
-        notifications: {
-            email: boolean;
-            push: boolean;
-            marketing: boolean;
-        };
-        newsletter: boolean;
-    };
+
     stats: {
         totalOrders: number;
         totalSpent: number;
         memberSince: Date;
     };
-    addresses: Array<{
-        _id?: string;
-        type: 'shipping' | 'billing';
-        firstName: string;
-        lastName: string;
-        addressLine1: string;
-        addressLine2?: string;
-        city: string;
-        state: string;
-        postalCode: string;
-        country: string;
-        phone: string;
-        isDefault: boolean;
-    }>;
+    addresses: Array<IAddress>;
     wishlist: Array<string>;
+
+    preferences: {
+        theme: 'light' | 'dark' | 'system';
+        language: string;
+        currency: string;
+        notifications: IUserNotificationPreferences;
+        privacy: IUserPrivacySettings;
+        marketing: IUserMarketingPreferences;
+        newsletter: boolean;
+    }
 }
 
 export interface IUserProfile {
-    firstName: string;
-    lastName: string;
     displayName: string;
     photoURL?: string;
     phone?: string;
@@ -73,23 +61,15 @@ export interface IUserProfile {
     };
 }
 
-export interface IUserPreferences {
-    theme: 'light' | 'dark' | 'system';
-    language: string;
-    currency: string;
-    notifications: IUserNotificationPreferences;
-    privacy: IUserPrivacySettings;
-    marketing: IUserMarketingPreferences;
-}
-
 export interface IUserNotificationPreferences {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-    orderUpdates: boolean;
-    promotions: boolean;
-    newsletter: boolean;
-    abandonedCart: boolean;
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    orderUpdates?: boolean;
+    promotions?: boolean;
+    newsletter?: boolean;
+    abandonedCart?: boolean;
+    marketing?: boolean;
 }
 
 export interface IUserPrivacySettings {
@@ -113,7 +93,7 @@ export interface IUserCart {
         variant?: string;
         addedAt: string;
     }>;
-    updatedAt: string;
+    updatedAt: string
 }
 
 export interface IUserStats {
@@ -137,41 +117,14 @@ export interface IUserMeta {
 }
 
 // Auth Types
-// export interface IAuthUser {
-//     uid: string;
-//     email: string | null;
-//     emailVerified: boolean;
-//     displayName: string | null;
-//     photoURL: string | null;
-//     role?: EUserRole;
-//     isActive?: boolean;
-// }
+export interface IAuthUser {
+    firebaseUid: string
+    email: string
+    displayName: string
+    photoURL?: string
 
-// export interface ISignUpData {
-//     email: string;
-//     password: string;
-//     firstName: string;
-//     lastName: string;
-//     displayName?: string;
-//     phone?: string;
-//     acceptTerms: boolean;
-//     subscribeNewsletter?: boolean;
-// }
+    role?: EUserRole
+    status?: EUserStatus
+    dbId?: string
+}
 
-// export interface ISignInData {
-//     email: string;
-//     password: string;
-//     rememberMe?: boolean;
-// }
-
-// export interface IPasswordResetData {
-//     email: string;
-// }
-
-// export interface IUpdatePasswordData {
-//     currentPassword: string;
-//     newPassword: string;
-//     confirmPassword: string;
-// }
-
-// Auth Context

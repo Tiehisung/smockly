@@ -8,8 +8,7 @@ import { CategoriesPage } from "../pages/category/CategoriesPage";
 import { NewArrivals } from "../pages/NewArrivals";
 import { Bestsellers } from "../pages/BestSellers";
 import { ProductDetails } from "../pages/product/ProductDetailsPage";
-import { Wishlist } from "../pages/account/Wishlist";
-
+ 
  
 export const shopRoutes: RouteObject[] = [
   {
@@ -45,8 +44,5 @@ export const shopRoutes: RouteObject[] = [
     path: "cart",
     element: <CartPage />,
   },
-  {
-    path: "wishlist",
-    element: <Wishlist />,
-  },
+ 
 ];

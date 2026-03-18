@@ -1,6 +1,6 @@
 // src/store/api/ordersApi.ts
 
-import type { IApiResponse, IBaseQueryParams, IPaginatedResponse,   } from "../../types";
+import type { IApiResponse, IBaseQueryParams, IPaginatedResponse, } from "../../types";
 import type { ICreateOrderPayload, IOrder } from "../../types/order.types";
 import type { IProcessPaymentResponse, IPaymentVerificationPayload, IPaystackInitializeResponse, IPaystackInitializePayload, IPaystackVerificationResponse } from "../../types/payment.types";
 import { baseApi } from "./baseApi";
@@ -40,13 +40,9 @@ export const ordersApi = baseApi.injectEndpoints({
                 url: '/orders',
                 params,
             }),
-            providesTags: (result) =>
-                result
-                    ? [
-                        ...(result.data || [])?.map(({ _id }) => ({ type: TAG_TYPES.ORDERS, id: _id })),
-                        { type: TAG_TYPES.ORDERS, id: 'LIST' },
-                    ]
-                    : [{ type: TAG_TYPES.ORDERS, id: 'LIST' }],
+            providesTags: () =>[TAG_TYPES.ORDERS, { type: TAG_TYPES.ORDERS, id: 'LIST' }],
+
+                
         }),
 
         // Get order by ID

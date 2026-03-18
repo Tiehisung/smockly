@@ -13,7 +13,7 @@ import {
 import toast from "react-hot-toast";
 import { INPUT } from "../../components/input/Input";
 import { CHECKBOX } from "../../components/input/Checkbox";
-import { Button } from "../../components/Button";
+import { Button } from "../../components/buttons/Button";
 import { Tabs } from "../../components/tabs";
 import { useUpdateUserProfileMutation } from "../../store/api/user.api";
 
@@ -48,7 +48,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 type NotificationFormData = z.infer<typeof notificationSchema>;
 type PrivacyFormData = z.infer<typeof privacySchema>;
 
-export function Profile() {
+export function CustomerProfile() {
   const { user, dbUser } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [updateProfile, { isLoading }] = useUpdateUserProfileMutation();
@@ -105,9 +105,6 @@ export function Profile() {
         displayName: dbUser.displayName || user?.displayName || "",
         email: user?.email || "",
         phone: dbUser.phone || "",
-        // bio: dbUser.bio || "",
-        // location: dbUser.location || "",
-        // website: dbUser.website || "",
       });
 
       resetNotifications({
@@ -131,10 +128,6 @@ export function Profile() {
     try {
       await updateProfile({
         displayName: data.displayName,
-        // phone: data.phone,
-        // bio: data.bio,
-        // location: data.location,
-        // website: data.website,
       }).unwrap();
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -164,11 +157,11 @@ export function Profile() {
     try {
       await updateProfile({
         preferences: {
-          ...{
+          ...({
             privacy: {
               ..._data,
             },
-          } as any,
+          } as any),
         },
       }).unwrap();
       toast.success("Privacy settings updated");

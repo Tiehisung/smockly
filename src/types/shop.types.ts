@@ -1,8 +1,6 @@
 // Address Types
 export interface IAddress {
-    _id?: string;
-    firstName: string;
-    lastName: string;
+    _id?: string; 
     addressLine1: string;
     addressLine2?: string;
     city: string;

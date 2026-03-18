@@ -1,4 +1,4 @@
-import type { IUser } from '../../types/user.types';
+import type { EUserRole, EUserStatus, IUser } from '../../types/user.types';
 import type { IApiResponse, IQueryParams } from '../../types';
 import { baseApi } from './baseApi';
 import type { IAddress } from '../../types/shop.types';
@@ -83,12 +83,12 @@ export const userApi = baseApi.injectEndpoints({
         }),
 
         // Addresses
-        getAddresses: builder.query<IAddress[], void>({
+        getAddresses: builder.query<IApiResponse<IAddress[]>, void>({
             query: () => '/users/addresses',
             providesTags: ['Addresses']
         }),
 
-        addAddress: builder.mutation<IAddress[], IAddress>({
+        addAddress: builder.mutation<IApiResponse<IAddress[]>, IAddress>({
             query: (address) => ({
                 url: '/users/addresses',
                 method: 'POST',
@@ -97,7 +97,7 @@ export const userApi = baseApi.injectEndpoints({
             invalidatesTags: ['Addresses']
         }),
 
-        updateAddress: builder.mutation<IAddress[], { addressId: string; data: Partial<IAddress> }>({
+        updateAddress: builder.mutation<IApiResponse<IAddress[]>, { addressId: string; data: Partial<IAddress> }>({
             query: ({ addressId, data }) => ({
                 url: `/users/addresses/${addressId}`,
                 method: 'PUT',
@@ -105,7 +105,7 @@ export const userApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Addresses']
         }),
-        deleteAddress: builder.mutation<IAddress[], string>({
+        deleteAddress: builder.mutation<IApiResponse<IAddress[]>, string>({
             query: (addressId) => ({
                 url: `/users/addresses/${addressId}`,
                 method: 'DELETE'
@@ -159,30 +159,20 @@ export const userApi = baseApi.injectEndpoints({
         }),
 
         // Admin: Update user role
-        updateUserRole: builder.mutation<IUser, { userId: string; role: string }>({
-            query: ({ userId, role }) => ({
-                url: `/users/admin/${userId}/role`,
+        updateAuthUser: builder.mutation<IApiResponse, { _id: string; role?: EUserRole, displayName?: string, status?: EUserStatus }>({
+            query: ({ _id, ...rest }) => ({
+                url: `/users/auth/${_id}`,
                 method: 'PUT',
-                body: { role },
-            }),
-            invalidatesTags: ['Users'],
-            transformResponse: (response: UserResponse) => response.data,
-        }),
-
-        // Admin: Toggle user status
-        toggleUserStatus: builder.mutation<IUser, string>({
-            query: (userId) => ({
-                url: `/users/admin/${userId}/status`,
-                method: 'PATCH',
+                body: rest,
             }),
             invalidatesTags: ['Users', 'User'],
-            transformResponse: (response: UserResponse) => response.data,
+            // transformResponse: (response: UserResponse) => response,
         }),
 
         // Admin: Delete any user
         adminDeleteUser: builder.mutation<IApiResponse, string>({
             query: (userId) => ({
-                url: `/users/admin/${userId}`,
+                url: `/users/${userId}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Users'],
@@ -195,14 +185,8 @@ export const userApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: { uid },
             }),
-        }), // Delete account
-        deleteAccount: builder.mutation<void, { confirmation: string }>({
-            query: (data) => ({
-                url: '/users/account',
-                method: 'DELETE',
-                body: data
-            })
-        })
+        }), 
+       
     }),
 })
 
@@ -215,8 +199,8 @@ export const {
     useUpdateUserProfileMutation,
     useDeleteOwnAccountMutation,
     useGetAllUsersQuery,
-    useUpdateUserRoleMutation,
-    useToggleUserStatusMutation,
+    useUpdateAuthUserMutation,
+    
     useAdminDeleteUserMutation,
     useUpdateLastLoginMutation,
     useGetAddressesQuery,
@@ -227,5 +211,5 @@ export const {
     useAddToWishlistMutation,
     useRemoveFromWishlistMutation,
     useGetUserStatsQuery,
-    useDeleteAccountMutation
+  
 } = userApi;

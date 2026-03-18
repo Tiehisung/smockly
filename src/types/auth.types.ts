@@ -1,5 +1,5 @@
 import type { User as FirebaseUser } from "firebase/auth";
-import type { EUserRole, IUser, IUserPreferences, IUserProfile } from "./user.types";
+import type { EUserRole, IUser, IUserProfile } from "./user.types";
 
 export interface IAuthUser {
     uid: string;
@@ -46,7 +46,7 @@ export interface IAuthContext {
     logout: () => Promise<void>;
     refreshUser?: () => Promise<void>;
     updateProfile?: (data: Partial<IUserProfile>) => Promise<void>;
-    updatePreferences?: (data: Partial<IUserPreferences>) => Promise<void>;
+    updatePreferences?: (data: Partial<IUser['preferences']>) => Promise<void>;
     clearError?: () => void;
 }
 
@@ -60,6 +60,6 @@ export const mapFirebaseUser = (user: FirebaseUser | null): IAuthUser | null => 
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        emailVerified: user.emailVerified
+        emailVerified: user.emailVerified,
     };
 };

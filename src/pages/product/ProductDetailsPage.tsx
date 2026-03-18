@@ -2,8 +2,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
-  HeartIcon,
-  HeartIcon as HeartIconSolid,
   ShoppingBagIcon,
   TruckIcon,
   ArrowPathIcon,
@@ -22,20 +20,20 @@ import { ProductVariants } from "./ProductVariants";
 import { QuantitySelector } from "./QuantitySelector";
 import { allProducts } from "../../data/products";
 import { useCart } from "../../hooks/useCart";
-import { useWishlist } from "../../hooks/useWishlist";
 import {
   useGetProductBySlugQuery,
   useGetRelatedProductsQuery,
 } from "../../store/api/productsApi";
 import type { IProduct } from "../../types/product.types";
 import useScrollToTop from "../../hooks/useScrollToTop";
+import { WishlistButton } from "../account/WishlistButton";
+import { AddToCartButton } from "../cart/AddToCartBtn";
 
 export function ProductDetails() {
   useScrollToTop();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
@@ -88,7 +86,7 @@ export function ProductDetails() {
     if (!product) return;
 
     addToCart({
-      productId:product?._id,
+      productId: product?._id,
       quantity,
       variant: product?.variants?.find((v) => v._id === selectedVariant),
     });
@@ -163,7 +161,6 @@ export function ProductDetails() {
     );
   }
 
-  const inWishlist = isInWishlist(product?._id as string);
   const discount = product?.compareAtPrice
     ? Math.round(
         ((product?.compareAtPrice.amount - product?.price.amount) /
@@ -362,33 +359,24 @@ export function ProductDetails() {
                   />
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <ShoppingBagIcon className="w-5 h-5" />
-                    <span>Add to Cart</span>
-                  </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <AddToCartButton
+                    product={product as IProduct}
+                    className="grow"
+                    quantity={quantity}
+                  />
                   <button
                     onClick={handleBuyNow}
-                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                    className="grow text-nowrap flex-1 bg-green-600 text-white px-6 py-2 h-12 rounded-lg font-semibold hover:bg-green-700 transition-colors"
                   >
                     Buy Now
                   </button>
-                  <button
-                    onClick={() => toggleWishlist(product?._id as string)}
-                    className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    title={
-                      inWishlist ? "Remove from wishlist" : "Add to wishlist"
-                    }
-                  >
-                    {inWishlist ? (
-                      <HeartIconSolid className="w-5 h-5 text-red-500" />
-                    ) : (
-                      <HeartIcon className="w-5 h-5 text-gray-600" />
-                    )}
-                  </button>
+
+                  <WishlistButton
+                    productId={product?._id as string}
+                    className="border rounded-md h-12"
+                    size="lg"
+                  />
                   <div className="relative">
                     <button
                       onClick={() => setShowShareMenu(!showShareMenu)}

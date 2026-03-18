@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 // src/components/home/HeroSection.tsx
 export function HeroSection() {
+  
   return (
     <div className="relative bg-linear-to-r from-blue-600 to-purple-600 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -13,7 +14,7 @@ export function HeroSection() {
             Handcrafted with love, tradition, and style. Explore our collection
             of premium smocks for every occasion.
           </p>
-          <div className="space-x-4">
+          <div className="space-x-4 space-y-2">
             <Link
               to="/shop"
               className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 inline-block"

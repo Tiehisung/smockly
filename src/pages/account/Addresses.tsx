@@ -1,44 +1,30 @@
 // src/pages/account/Addresses.tsx
 import { useState } from "react";
-
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
-
 import {
   PlusIcon,
   PencilIcon,
-  TrashIcon,
   HomeIcon,
   BuildingOfficeIcon,
 } from "@heroicons/react/24/outline";
-import toast from "react-hot-toast";
 import { Drawer } from "../../components/headlessUI/Drawer";
 import {
   useGetAddressesQuery,
-  useAddAddressMutation,
-  useUpdateAddressMutation,
   useDeleteAddressMutation,
 } from "../../store/api/user.api";
-import { Button } from "../../components/Button";
+import { Button } from "../../components/buttons/Button";
 import { AddressForm } from "./AddressForm";
-import { AddressCard } from "./AddressCard";
+import { smartToast } from "../../lib/toast";
+import { DeleteConfirmButton } from "../../components/DeleteConfirmButton";
 
-export function Addresses() {
+export function AccountAddresses() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const { data: addresses, isLoading } = useGetAddressesQuery();
-  const [addAddress] = useAddAddressMutation();
-  const [updateAddress] = useUpdateAddressMutation();
+  const { data: addressesData, isLoading } = useGetAddressesQuery();
+  const addresses = addressesData?.data;
+
   const [deleteAddress] = useDeleteAddressMutation();
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner />
-      </div>
-    );
-  }
 
   const handleAddAddress = () => {
     setEditingAddress(null);
@@ -50,39 +36,26 @@ export function Addresses() {
     setDrawerOpen(true);
   };
 
-  const [deletingId, setDeletingId] = useState("");
   const handleDeleteAddress = async (addressId: string) => {
     try {
-      setDeletingId(addressId);
-      await deleteAddress(addressId).unwrap();
-      toast.success("Address deleted successfully");
-      setDeleteConfirm(null);
-    } catch (error) {
-      toast.error("Failed to delete address");
+      const result = await deleteAddress(addressId).unwrap();
+      smartToast(result);
+    } catch (error: any) {
+      smartToast(error);
     }
   };
 
-  const handleSubmit = async (data: any) => {
-    try {
-      if (editingAddress) {
-        await updateAddress({ addressId: editingAddress._id, data }).unwrap();
-        toast.success("Address updated successfully");
-      } else {
-        await addAddress(data).unwrap();
-        toast.success("Address added successfully");
-      }
-      setDrawerOpen(false);
-    } catch (error) {
-      toast.error(
-        editingAddress ? "Failed to update address" : "Failed to add address",
-      );
-    }
-  };
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row gap-3.5 justify-between items-center ">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Addresses</h1>
           <p className="text-gray-500 mt-1">
@@ -126,30 +99,9 @@ export function Addresses() {
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
-                  {!address.isDefault &&
-                    (deleteConfirm === address._id ? (
-                      <div className="flex items-center space-x-1">
-                        <button
-                          onClick={() => handleDeleteAddress(address._id)}
-                          className="p-1 text-red-600 hover:text-red-800"
-                        >
-                          ✓
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm(null)}
-                          className="p-1 text-gray-400 hover:text-gray-600"
-                        >
-                          ✗
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirm(address._id)}
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
-                    ))}
+                  <DeleteConfirmButton
+                    onDelete={() => handleDeleteAddress(address._id)}
+                  />
                 </div>
               </div>
 
@@ -194,21 +146,10 @@ export function Addresses() {
         <div className="p-6">
           <AddressForm
             initialData={editingAddress}
-            onSubmit={handleSubmit}
             onCancel={() => setDrawerOpen(false)}
           />
         </div>
       </Drawer>
-      {/* For displaying addresses: */}
-      {addresses?.map((address) => (
-        <AddressCard
-          key={address._id}
-          address={address}
-          onEdit={() => handleEditAddress(address)}
-          onDelete={() => handleDeleteAddress(address?._id as string)}
-          isDeleting={deletingId === address._id}
-        />
-      ))}
     </div>
   );
 }

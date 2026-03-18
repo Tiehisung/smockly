@@ -1,8 +1,10 @@
- 
-
 import type { CSSProperties, MouseEventHandler } from "react";
- 
-import { type TButtonSize, type TButtonVariant, Button as Btn } from "./ui/button";
+
+import {
+  type TButtonSize,
+  type TButtonVariant,
+  Button as Btn,
+} from "../ui/button";
 import { Loader2 } from "lucide-react";
 
 interface ButtonProps {

@@ -31,7 +31,7 @@ export function ProductFilters({
   categories,
   mobileFiltersOpen,
   setMobileFiltersOpen,
-  isLoading,
+  isLoading, 
 }: ProductFiltersProps) {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -52,6 +52,7 @@ export function ProductFilters({
     }
     params.set("page", "1");
     setSearchParams(params);
+   setMobileFiltersOpen(false);
   };
 
   const handleSizeChange = (size: string) => {

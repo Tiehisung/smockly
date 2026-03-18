@@ -5,7 +5,6 @@ import { CategoryShowcase } from "../components/home/CategoryShowcase";
 import { FeaturedProducts } from "../components/home/FeaturedProducts";
 import { HeroSection } from "../components/home/HeroSection";
 import { NewArrivalsSection } from "../components/home/NewArrivalsSection";
-import { NewsletterSection } from "../components/home/NewsletterSection";
 
 export function Home() {
   return (
@@ -15,7 +14,6 @@ export function Home() {
       <FeaturedProducts />
       <CategoryShowcase />
       <Bestsellers />
-      <NewsletterSection />
     </>
   );
 }

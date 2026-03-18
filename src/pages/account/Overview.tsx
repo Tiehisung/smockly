@@ -22,21 +22,13 @@ import { useGetUserStatsQuery } from "../../store/api/user.api";
 
 export function AccountOverview() {
   const { user } = useAuth();
-  const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery();
+  const { data: stats,   } = useGetUserStatsQuery();
 
   const { data: recentOrders, isLoading: ordersLoading } =
     useGetUserOrdersQuery({ limit: 3 });
   const { data: wishlist, isLoading: wishlistLoading } = useGetWishlistQuery();
 
-  const isLoading = statsLoading || ordersLoading || wishlistLoading;
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  const isLoading =  ordersLoading || wishlistLoading;
 
   const quickActions = [
     {
@@ -83,6 +75,14 @@ export function AccountOverview() {
         return <ClockIcon className="w-4 h-4 text-gray-500" />;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
