@@ -226,7 +226,7 @@ export function AdminProducts() {
                         className="h-10 w-10 rounded-lg object-cover"
                       />
                     </div>
-                    <div className="ml-4">
+                    <div className="ml-4 text-left">
                       <div className="text-sm font-medium text-gray-900">
                         {product.name}
                       </div>
