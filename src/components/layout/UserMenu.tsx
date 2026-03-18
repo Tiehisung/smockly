@@ -31,7 +31,7 @@ export function UserMenu() {
   const customerMenuItems = [
     {
       label: "My Profile",
-      href: "/profile",
+      href: "/account",
       icon: <UserIcon className="w-4 h-4" />,
     },
     {
@@ -63,11 +63,7 @@ export function UserMenu() {
   ];
 
   const adminMenuItems = [
-    {
-      label: "My Profile",
-      href: "/profile",
-      icon: <UserIcon className="w-4 h-4" />,
-    },
+    
     {
       label: "Account",
       href: "/admin",
@@ -87,7 +83,7 @@ export function UserMenu() {
     },
   ];
 
-  const menuItems = user ? adminMenuItems : customerMenuItems;
+  const menuItems = user?.role?.includes('admin') ? adminMenuItems : customerMenuItems;
 
   return (
     <Dropdown

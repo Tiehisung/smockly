@@ -33,7 +33,7 @@ export function ProtectedRoute({
   }
 
   if (requiredRole && !requiredRole.includes(user?.role as string)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/" replace />;
   }
   // useScrollToTop();
 

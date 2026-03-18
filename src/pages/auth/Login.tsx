@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../configs/firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { SocialLogin } from "../../components/auth/SocialLogin";
+import { authService } from "../../services/auth.service";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { isLoading } = useAuth();
+  const {  isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -28,8 +28,14 @@ export function LoginPage() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/admin");
+   
+      const newuser = await authService.signUp({
+        email,
+        password,
+        displayName,
+      });
+      if (newuser?.role?.includes("admin")) navigate("/admin");
+      else navigate("/shop");
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -52,6 +58,21 @@ export function LoginPage() {
             </div>
           )}
           <div className="rounded-md space-y-4">
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Username
+              </label>
+              <input
+                id="username"
+                name="displayName"
+                type="text"
+                required
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Username"
+              />
+            </div>
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address
