@@ -2,7 +2,7 @@ import type { RouteObject } from "react-router-dom";
 import { LoginPage } from "../pages/auth/Login";
 import { SignupPage } from "../pages/auth/Signup";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
-import { AuthLayout } from "../components/layout/AuthLayout";
+import { AuthLayout } from "../pages/auth/AuthLayout";
 
 export const authRoutes: RouteObject = {
   path: "/auth",

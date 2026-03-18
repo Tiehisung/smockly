@@ -5,17 +5,20 @@ import { z } from "zod";
 import {
   MapPinIcon,
   PhoneIcon,
-  UserIcon,
   BuildingOfficeIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
 import { INPUT } from "../../components/input/Input";
-import { Button } from "../../components/Button";
+import { Button } from "../../components/buttons/Button";
+import {
+  useAddAddressMutation,
+  useUpdateAddressMutation,
+} from "../../store/api/user.api";
+import { smartToast } from "../../lib/toast";
+import { CHECKBOX } from "../../components/input/Checkbox";
 
 const addressSchema = z.object({
   type: z.enum(["shipping", "billing"]),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   addressLine1: z.string().min(5, "Address is required"),
   addressLine2: z.string().optional(),
   city: z.string().min(2, "City is required"),
@@ -29,10 +32,9 @@ const addressSchema = z.object({
 export type AddressFormData = z.infer<typeof addressSchema>;
 
 interface AddressFormProps {
-  initialData?: Partial<AddressFormData>;
-  onSubmit: (data: AddressFormData) => Promise<void>;
-  onCancel: () => void;
-  isLoading?: boolean;
+  initialData?: Partial<AddressFormData> & { _id?: string };
+  onCancel?: () => void;
+  onSuccess?: () => void;
 }
 
 // Common countries list
@@ -53,9 +55,8 @@ const countries = [
 
 export function AddressForm({
   initialData,
-  onSubmit,
   onCancel,
-  isLoading = false,
+  onSuccess,
 }: AddressFormProps) {
   const {
     control,
@@ -65,8 +66,6 @@ export function AddressForm({
     resolver: zodResolver(addressSchema as any),
     defaultValues: {
       type: "shipping",
-      firstName: "",
-      lastName: "",
       addressLine1: "",
       addressLine2: "",
       city: "",
@@ -78,9 +77,30 @@ export function AddressForm({
       ...initialData,
     },
   });
+  const [addAddress, { isLoading: isAdding }] = useAddAddressMutation();
+  const [updateAddress, { isLoading: isEditing }] = useUpdateAddressMutation();
+
+  const handleAdd = async (data: any) => {
+    try {
+      if (initialData?._id) {
+        const result = await updateAddress({
+          addressId: initialData._id,
+          data,
+        }).unwrap();
+        smartToast(result);
+      } else {
+        const result = await addAddress(data).unwrap();
+        smartToast(result);
+      }
+      onSuccess?.();
+      onCancel?.();
+    } catch (error: any) {
+      smartToast(error);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(handleAdd)} className="space-y-6">
       {/* Address Type */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -123,37 +143,6 @@ export function AddressForm({
         {errors.type && (
           <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
         )}
-      </div>
-
-      {/* Name Fields */}
-      <div className="grid grid-cols-2 gap-4">
-        <Controller
-          name="firstName"
-          control={control}
-          render={({ field }) => (
-            <INPUT
-              {...field}
-              label="First Name"
-              placeholder="John"
-              error={errors.firstName?.message}
-              leftIcon={<UserIcon className="w-5 h-5 text-gray-400" />}
-            />
-          )}
-        />
-
-        <Controller
-          name="lastName"
-          control={control}
-          render={({ field }) => (
-            <INPUT
-              {...field}
-              label="Last Name"
-              placeholder="Doe"
-              error={errors.lastName?.message}
-              leftIcon={<UserIcon className="w-5 h-5 text-gray-400" />}
-            />
-          )}
-        />
       </div>
 
       {/* Address Line 1 */}
@@ -278,33 +267,34 @@ export function AddressForm({
         name="isDefault"
         control={control}
         render={({ field }) => (
-          <label className="flex items-center space-x-3">
-            <INPUT
-              type="checkbox"
-              checked={field.value}
-              onChange={field.onChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">
-              Set as default address
-            </span>
-          </label>
+          <CHECKBOX
+            checked={field.value}
+            onChange={field.onChange}
+            label="Set as default address"
+          />
         )}
       />
 
       {/* Form Actions */}
       <div className="flex space-x-3 pt-4">
-        <Button type="submit" isLoading={isLoading} className="flex-1">
-          {initialData ? "Update Address" : "Save Address"}
-        </Button>
         <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
+          type="submit"
+          isLoading={isAdding || isEditing}
           className="flex-1"
         >
-          Cancel
+          {initialData?._id ? "Update Address" : "Save Address"}
         </Button>
+
+        {onCancel && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+        )}
       </div>
     </form>
   );

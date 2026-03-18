@@ -19,8 +19,9 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import type { EProductStatus } from "../../../types/product.types";
+import { smartToast } from "../../../lib/toast";
+import { DROPDOWN } from "../../../components/Dropdown";
 
 export function AdminProducts() {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ export function AdminProducts() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
-    null,
-  );
+
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   const {
@@ -55,22 +54,21 @@ export function AdminProducts() {
 
   const handleDeleteProduct = async (id: string) => {
     try {
-      await deleteProduct(id).unwrap();
-      toast.success("Product deleted successfully");
-      setShowDeleteConfirm(null);
+      const deleted = await deleteProduct(id).unwrap();
+      smartToast(deleted);
     } catch (error) {
-      toast.error("Failed to delete product");
+      smartToast({ error });
     }
   };
 
   const handleBulkDelete = async () => {
     try {
-      await bulkDeleteProducts({ ids: selectedProducts }).unwrap();
-      toast.success(`${selectedProducts.length} products deleted`);
+      const del = await bulkDeleteProducts({ ids: selectedProducts }).unwrap();
+      smartToast({ message: `${del?.deletedCount}` });
       setSelectedProducts([]);
       setShowBulkDeleteConfirm(false);
     } catch (error) {
-      toast.error("Failed to delete products");
+      smartToast({ error });
     }
   };
 
@@ -223,10 +221,7 @@ export function AdminProducts() {
                   <div className="flex items-center">
                     <div className="h-10 w-10 shrink-0">
                       <img
-                        src={
-                          product.images[0]?.url ||
-                          "https://via.placeholder.com/40"
-                        }
+                        src={product.images[0]?.url}
                         alt={product.name}
                         className="h-10 w-10 rounded-lg object-cover"
                       />
@@ -265,51 +260,33 @@ export function AdminProducts() {
                 </td>
                 <td className="px-6 py-4">{getStatusBadge(product.status)}</td>
                 <td className="px-6 py-4 text-right text-sm font-medium">
-                  <div className="relative">
+                  <DROPDOWN trigger={<MoreVertical className="w-5 h-5" />}>
                     <button
                       onClick={() =>
-                        setShowDeleteConfirm(
-                          showDeleteConfirm === product._id
-                            ? null
-                            : product._id,
-                        )
+                        navigate(`/admin/products/edit/${product._id}`)
                       }
-                      className="text-gray-400 hover:text-gray-600"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
-                      <MoreVertical className="w-5 h-5" />
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
                     </button>
-
-                    {showDeleteConfirm === product._id && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                        <button
-                          onClick={() =>
-                            navigate(`/admin/products/edit/${product._id}`)
-                          }
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            // Handle duplicate
-                            setShowDeleteConfirm(null);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                        >
-                          <Copy className="w-4 h-4 mr-2" />
-                          Duplicate
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProduct(product._id)}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                    <button
+                      onClick={() => {
+                        // Handle duplicate
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Duplicate
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </button>
+                  </DROPDOWN>
                 </td>
               </tr>
             ))}
@@ -398,7 +375,9 @@ export function AdminProducts() {
                     ))}
                   <button
                     onClick={() =>
-                      setPage((p) => Math.min(productsData?.pagination?.pages||1, p + 1))
+                      setPage((p) =>
+                        Math.min(productsData?.pagination?.pages || 1, p + 1),
+                      )
                     }
                     disabled={page === productsData?.pagination?.pages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"

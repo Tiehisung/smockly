@@ -1,5 +1,5 @@
 // src/pages/admin/AdminLayout.tsx
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, Link } from "react-router-dom";
 import { useState } from "react";
 import {
   HomeIcon,
@@ -11,8 +11,13 @@ import {
   ChartBarIcon,
   Cog6ToothIcon,
   Bars3Icon,
-  XMarkIcon,HomeModernIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { LogOut, User } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { Button } from "../../components/buttons/Button";
+import { AVATAR } from "../../components/ui/avatar";
+import { getInitials } from "../../lib";
 
 const navigation = [
   { name: "Dashboard", to: "/admin", icon: HomeIcon, end: true },
@@ -23,11 +28,12 @@ const navigation = [
   { name: "Coupons", to: "/admin/coupons", icon: TicketIcon },
   { name: "Reports", to: "/admin/reports", icon: ChartBarIcon },
   { name: "Settings", to: "/admin/settings", icon: Cog6ToothIcon },
-  { name: "Shop View", to: "/", icon: HomeModernIcon },
+  { name: "Users", to: "/admin/users", icon: User },
 ];
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout, isLoading } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -84,6 +90,14 @@ export function AdminLayout() {
                   {item.name}
                 </NavLink>
               ))}
+              <hr className="my-3" />
+              <Button
+                variant={"destructive"}
+                isLoading={isLoading}
+                onClick={logout}
+              >
+                <LogOut /> Sign Out
+              </Button>
             </nav>
           </div>
         </div>
@@ -92,8 +106,16 @@ export function AdminLayout() {
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-1 flex-col bg-white">
-          <div className="flex h-16 shrink-0 items-center px-4 border-b">
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+          <div className="flex gap-1.5 h-16 shrink-0 items-center px-4 border-b">
+            <AVATAR
+              src={user?.photoURL as string}
+              fallbackText={getInitials(user?.displayName as string)}
+            />
+            <h1 className="text-lg font-bold text-gray-900">
+              <Link to="/" className="text-2xl font-bold text-blue-600">
+                Smockly
+              </Link>
+            </h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => (
@@ -116,6 +138,16 @@ export function AdminLayout() {
                 {item.name}
               </NavLink>
             ))}
+
+            <hr className="my-3" />
+            <Button
+              variant={"destructive"}
+              isLoading={isLoading}
+              onClick={logout}
+              className="w-full"
+            >
+              <LogOut /> Sign Out
+            </Button>
           </nav>
         </div>
       </div>

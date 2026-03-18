@@ -1,24 +1,23 @@
 // src/components/ui/Checkbox.tsx
 import React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../lib/utils";
+ 
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  wrapperClassName?: string;
 }
 
 export const CHECKBOX = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, label, error, ...props }, ref) => {
+  ({ className, label, error, wrapperClassName, ...props }, ref) => {
     return (
-      <div className="w-full">
+      <div className={cn("w-full ", wrapperClassName)}>
         <label className="flex items-center gap-x-2">
           <input
             type="checkbox"
             ref={ref}
-            className={cn(
-              "rounded border-gray-300 ",
-              className,
-            )}
+            className={cn("rounded border-gray-300 ", className)}
             {...props}
           />
           {label && <span className="text-sm text-gray-700">{label}</span>}

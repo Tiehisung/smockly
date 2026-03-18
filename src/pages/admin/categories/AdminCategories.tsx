@@ -1,7 +1,6 @@
 // src/pages/admin/AdminCategories.tsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
 import {
   Plus,
   Edit,
@@ -15,7 +14,6 @@ import {
   AlertCircle,
   Package,
 } from "lucide-react";
-
 import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
 import {
   useGetCategoryTreeQuery,

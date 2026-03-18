@@ -24,7 +24,7 @@ export function AccountLayout() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Navigation */}
-        <div className="md:w-64 shrink-0">
+        <div className="md:w-44 shrink-0">
           <nav className="space-y-1">
             {navigation.map((item) => (
               <NavLink

@@ -19,23 +19,17 @@ import { Button } from "../../components/ui/button";
 import { Drawer } from "../../components/headlessUI/Drawer";
 import { ProductCard } from "../product/ProductCard";
 import { Facebook, Twitter } from "lucide-react";
+import { CHECKBOX } from "../../components/input/Checkbox";
 
 export function Wishlist() {
-  const {
-    wishlist,
-    isLoading,
-    itemCount,
-    removeFromWishlist,
-    clearWishlist,
-    moveToCart,
-  } = useWishlist();
+  const { wishlist, isLoading, itemCount, removeFromWishlist, clearWishlist } =
+    useWishlist();
 
   const wishlistData = wishlist?.data || [];
 
   const { addToCart } = useCart();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [shareDrawerOpen, setShareDrawerOpen] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // Handle select all items
   const handleSelectAll = () => {
@@ -76,11 +70,6 @@ export function Wishlist() {
     }
     toast.success(`${selectedItems.length} items removed from wishlist`);
     setSelectedItems([]);
-  };
-
-  // Handle move to cart
-  const handleMoveToCart = async (productId: string) => {
-    await moveToCart(productId);
   };
 
   // Handle share wishlist
@@ -141,20 +130,17 @@ export function Wishlist() {
 
         {/* Bulk Actions */}
         {wishlistData?.length > 1 && (
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-6 flex items-center justify-between">
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6 grid sm:flex gap-2.5 items-center justify-between">
             <div className="flex items-center space-x-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.length === wishlistData?.length}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Select All</span>
-              </label>
+              <CHECKBOX
+                checked={selectedItems.length === wishlistData?.length}
+                onChange={handleSelectAll}
+                label="Select All" wrapperClassName="w-fit"
+              />
               {selectedItems.length > 0 && (
-                <span className="text-sm text-gray-500">
-                  {selectedItems.length} item(s) selected
+                <span className="text-sm text-muted-foreground">
+                  {selectedItems.length} item
+                  {selectedItems.length == 1 ? "" : "s"} selected
                 </span>
               )}
             </div>
@@ -165,10 +151,10 @@ export function Wishlist() {
                   <ShoppingBagIcon className="w-4 h-4" /> Add to Cart
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
                   onClick={handleRemoveSelected}
-                  className="text-red-600 hover:text-red-700"
+                  // className="text-red-600 hover:text-red-700"
                 >
                   <TrashIcon className="w-4 h-4" /> Remove
                 </Button>
@@ -214,48 +200,6 @@ export function Wishlist() {
 
                 {/* Product Card */}
                 <ProductCard product={product} />
-
-                {/* Quick Actions Overlay */}
-                <div className="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg">
-                  <div className="flex items-center justify-center space-x-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleMoveToCart(product._id)}
-                      className="bg-white text-gray-900 hover:bg-gray-100"
-                    >
-                      <ShoppingBagIcon className="w-4 h-4" /> Move to Cart
-                    </Button>
-                    {deleteConfirm === product._id ? (
-                      <div className="flex items-center space-x-1 bg-white rounded-lg p-1">
-                        <button
-                          onClick={() => {
-                            removeFromWishlist(product._id);
-                            setDeleteConfirm(null);
-                          }}
-                          className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirm(null)}
-                          className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setDeleteConfirm(product._id)}
-                        className="bg-white text-red-600 hover:bg-red-50"
-                      >
-                        <TrashIcon className="w-4 h-4" /> Remove
-                      </Button>
-                    )}
-                  </div>
-                </div>
               </div>
             ))}
           </div>

@@ -10,6 +10,7 @@ import { AdminOrderDetails } from "../pages/admin/orders/AdminOrderDetails";
 import { AdminOrders } from "../pages/admin/orders/AdminOrders";
 import { AdminCategories } from "../pages/admin/categories/AdminCategories";
 import { AdminCategoryForm } from "../pages/admin/categories/AdminCategoryForm";
+import UsersPage from "../pages/admin/users/page";
 // import { AdminProductForm } from "../pages/admin/AdminProductForm";
 // import { AdminOrders } from "../pages/admin/AdminOrders";
 // import { AdminOrderDetails } from "../pages/admin/AdminOrderDetails";
@@ -88,10 +89,10 @@ export const adminRoutes: RouteObject = {
         //       path: "customers",
         //       element: <AdminCustomers />,
         //     },
-        //     {
-        //       path: "users",
-        //       element: <AdminUsers />,
-        //     },
+        {
+          path: "users",
+          element: <UsersPage />,
+        },
         //     {
         //       path: "coupons",
         //       element: <AdminCoupons />,

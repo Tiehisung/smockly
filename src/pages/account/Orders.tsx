@@ -33,16 +33,16 @@ const statusIcons = {
   refunded: XCircleIcon,
 };
 
-export function Orders() {
+export function AccountOrders() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [search, setSearch] = useState("");
 
-  const { data:userOrdersData, isLoading } = useGetUserOrdersQuery({
+  const { data: userOrdersData, isLoading } = useGetUserOrdersQuery({
     page,
     limit: 10,
     status: statusFilter || undefined,
-    search: search  
+    search: search,
   });
 
   if (isLoading) {

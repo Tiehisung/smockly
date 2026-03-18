@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<IAuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const dispatch = useAppDispatch(); // Redux dispatchc
+  const dispatch = useAppDispatch(); // Redux dispatch 
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {

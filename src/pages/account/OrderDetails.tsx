@@ -38,7 +38,7 @@ const statusMessages = {
   refunded: "This order has been refunded.",
 };
 
-export function OrderDetails() {
+export function AccountOrderDetails() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -80,7 +80,7 @@ export function OrderDetails() {
 
   const handleCancelOrder = async () => {
     try {
-      await cancelOrder({orderId:order?._id,}).unwrap();
+      await cancelOrder({ orderId: order?._id }).unwrap();
       toast.success("Order cancelled successfully");
       setShowCancelConfirm(false);
     } catch (error) {

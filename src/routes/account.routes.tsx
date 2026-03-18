@@ -1,8 +1,13 @@
 // src/routes/account.routes.ts
 import type { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
-import { AccountLayout } from "../pages/account/AccountLayout";
+import { AccountLayout } from "../pages/account/Layout";
 import { Wishlist } from "../pages/account/Wishlist";
+import { AccountOverview } from "../pages/account/Overview";
+import { CustomerProfile } from "../pages/account/Profile";
+import { AccountAddresses } from "../pages/account/Addresses";
+import { AccountOrderDetails } from "../pages/account/OrderDetails";
+import { AccountOrders } from "../pages/account/Orders";
 // import { AccountOverview } from "../pages/account/AccountOverview";
 // import { AccountOrders } from "../pages/account/AccountOrders";
 // import { AccountOrderDetails } from "../pages/account/AccountOrderDetails";
@@ -17,30 +22,30 @@ export const accountRoutes: RouteObject = {
     {
       element: <AccountLayout />,
       children: [
-        // {
-        //   index: true,
-        //   element: <AccountOverview />,
-        // },
-        // {
-        //   path: "orders",
-        //   element: <AccountOrders />,
-        // },
-        // {
-        //   path: "orders/:orderId",
-        //   element: <AccountOrderDetails />,
-        // },
-        // {
-        //   path: "addresses",
-        //   element: <AccountAddresses />,
-        // },
+        {
+          index: true,
+          element: <AccountOverview />,
+        },
+        {
+          path: "orders",
+          element: <AccountOrders />,
+        },
+        {
+          path: "orders/:orderId",
+          element: <AccountOrderDetails />,
+        },
+        {
+          path: "addresses",
+          element: <AccountAddresses />,
+        },
         {
           path: "wishlist",
           element: <Wishlist />,
         },
-        // {
-        //   path: "settings",
-        //   element: <AccountSettings />,
-        // },
+        {
+          path: "profile",
+          element: <CustomerProfile />,
+        },
       ],
     },
   ],

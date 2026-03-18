@@ -1,6 +1,7 @@
 // src/components/ui/Textarea.tsx
 import React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../lib/utils";
+ 
  
  
 

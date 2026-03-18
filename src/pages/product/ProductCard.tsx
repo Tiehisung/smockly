@@ -1,15 +1,15 @@
 // src/components/products/ProductCard.tsx
 import { Link } from "react-router-dom";
-import { useCart } from "../../hooks/useCart";
 import type { IProduct } from "../../types/product.types";
 import { WishlistButton } from "../account/WishlistButton";
+import { AddToCartButton } from "../cart/AddToCartBtn";
 
 interface ProductCardProps {
   product: IProduct;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addToCart } = useCart();
+  
 
   const discount = product.compareAtPrice
     ? Math.round(
@@ -78,13 +78,17 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Add to Cart Button */}
-        <button
+        {/* <button
           onClick={() => addToCart({ productId: product._id, quantity: 1 })}
           disabled={product.inventory.quantity === 0}
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           {product.inventory.quantity === 0 ? "Out of Stock" : "Add to Cart"}
-        </button>
+        </button> */}
+        <AddToCartButton
+          product={product as IProduct}
+          className="grow w-full"
+        />
       </div>
     </div>
   );
