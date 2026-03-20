@@ -2,12 +2,13 @@
 import type { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { AccountLayout } from "../pages/account/Layout";
-import { Wishlist } from "../pages/account/Wishlist";
+import { Wishlist } from "../pages/account/wishlist/Wishlist";
 import { AccountOverview } from "../pages/account/Overview";
 import { CustomerProfile } from "../pages/account/Profile";
 import { AccountAddresses } from "../pages/account/Addresses";
 import { AccountOrderDetails } from "../pages/account/OrderDetails";
 import { AccountOrders } from "../pages/account/Orders";
+import { CartPage } from "../pages/account/cart/CartPage";
 // import { AccountOverview } from "../pages/account/AccountOverview";
 // import { AccountOrders } from "../pages/account/AccountOrders";
 // import { AccountOrderDetails } from "../pages/account/AccountOrderDetails";
@@ -41,6 +42,10 @@ export const accountRoutes: RouteObject = {
         {
           path: "wishlist",
           element: <Wishlist />,
+        },
+        {
+          path: "cart",
+          element: <CartPage />,
         },
         {
           path: "profile",

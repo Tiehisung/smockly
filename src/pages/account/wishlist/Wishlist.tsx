@@ -1,10 +1,10 @@
 // src/pages/account/WishlistwishlistData?.tsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useWishlist } from "../../hooks/useWishlist";
-import { useCart } from "../../hooks/useCart";
+import { useWishlist } from "../../../hooks/useWishlist";
+import { useCart } from "../../../hooks/useCart";
 
-import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
 
 import {
   HeartIcon,
@@ -15,11 +15,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 import toast from "react-hot-toast";
-import { Button } from "../../components/ui/button";
-import { Drawer } from "../../components/headlessUI/Drawer";
-import { ProductCard } from "../product/ProductCard";
+import { Button } from "../../../components/ui/button";
+import { Drawer } from "../../../components/headlessUI/Drawer";
+import { ProductCard } from "../../product/ProductCard";
 import { Facebook, Twitter } from "lucide-react";
-import { CHECKBOX } from "../../components/input/Checkbox";
+import { CHECKBOX } from "../../../components/input/Checkbox";
 
 export function Wishlist() {
   const { wishlist, isLoading, itemCount, removeFromWishlist, clearWishlist } =
@@ -135,7 +135,8 @@ export function Wishlist() {
               <CHECKBOX
                 checked={selectedItems.length === wishlistData?.length}
                 onChange={handleSelectAll}
-                label="Select All" wrapperClassName="w-fit"
+                label="Select All"
+                wrapperClassName="w-fit"
               />
               {selectedItems.length > 0 && (
                 <span className="text-sm text-muted-foreground">

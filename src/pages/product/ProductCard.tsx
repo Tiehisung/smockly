@@ -1,16 +1,14 @@
 // src/components/products/ProductCard.tsx
 import { Link } from "react-router-dom";
 import type { IProduct } from "../../types/product.types";
-import { WishlistButton } from "../account/WishlistButton";
-import { AddToCartButton } from "../cart/AddToCartBtn";
+import { WishlistButton } from "../account/wishlist/WishlistButton";
+import { AddToCartButton } from "../account/cart/AddToCartBtn";
 
 interface ProductCardProps {
   product: IProduct;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  
-
   const discount = product.compareAtPrice
     ? Math.round(
         ((product.compareAtPrice.amount - product.price.amount) /

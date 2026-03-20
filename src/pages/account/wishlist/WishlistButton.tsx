@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
-import { useWishlist } from "../../hooks/useWishlist";
-import { useAuth } from "../../contexts/AuthContext";
+import { useWishlist } from "../../../hooks/useWishlist";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { smartToast } from "../../../lib/toast";
 
 interface WishlistButtonProps {
   productId: string;
@@ -54,20 +54,22 @@ export function WishlistButton({
     e.stopPropagation();
 
     if (!user) {
-      navigate("/auth/login", {
+      navigate("/auth/signin", {
         state: { from: window.location.pathname },
         replace: true,
       });
-      toast.error("Please login to add items to wishlist");
+      smartToast({ message: "Please login to add items to wishlist" });
       return;
     }
 
     setIsToggling(true);
     try {
       await toggleWishlist(productId);
-      toast.success(inWishlist ? "Removed from wishlist" : "Added to wishlist");
+      smartToast({
+        message: inWishlist ? "Removed from wishlist" : "Added to wishlist",
+      });
     } catch (error) {
-      toast.error("Failed to update wishlist");
+      smartToast({ error: "Failed to update wishlist" });
     } finally {
       setIsToggling(false);
     }

@@ -8,12 +8,12 @@ import {
   useMoveToCartMutation,
   useLazyCheckInWishlistQuery,
 } from "../store/api/wishlistApi";
-import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useAppSelector } from "../store/hooks";
 
 export const useWishlist = () => {
-  const { user } = useAuth();
+  const { user } = useAppSelector((s) => s.auth);
   const navigate = useNavigate();
 
   const {

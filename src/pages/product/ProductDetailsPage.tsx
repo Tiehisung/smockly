@@ -26,8 +26,8 @@ import {
 } from "../../store/api/productsApi";
 import type { IProduct } from "../../types/product.types";
 import useScrollToTop from "../../hooks/useScrollToTop";
-import { WishlistButton } from "../account/WishlistButton";
-import { AddToCartButton } from "../cart/AddToCartBtn";
+import { WishlistButton } from "../account/wishlist/WishlistButton";
+import { AddToCartButton } from "../account/cart/AddToCartBtn";
 
 export function ProductDetails() {
   useScrollToTop();

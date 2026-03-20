@@ -6,6 +6,7 @@ import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist
 // Import your reducers
 import userReducer from './slices/userSlice';
 import appReducer from './slices/appSlice';
+import authReducer from "./slices/auth.slice";
 import { baseApi } from './api/baseApi';
 
 
@@ -20,6 +21,7 @@ const persistConfig = {
 // Combine all reducers
 const rootReducer = combineReducers({
     [baseApi.reducerPath]: baseApi.reducer,
+    auth: authReducer,
     user: userReducer,
     app: appReducer,
 });

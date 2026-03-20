@@ -11,9 +11,11 @@ import {
 } from '../store/api/cartApi';
 import type { IAddToCartPayload } from '../types/cart.types';
 import { smartToast } from '../lib/toast';
+import { useAppSelector } from '../store/hooks';
 
 export const useCart = () => {
-    const { data: cart, isLoading, refetch } = useGetCartQuery();
+    const { user } = useAppSelector((s) => s.auth);
+    const { data: cart, isLoading, refetch } = useGetCartQuery(undefined, { skip: !user });
     const cartData = cart?.data
 
     const [addToCartMutation] = useAddToCartMutation();
