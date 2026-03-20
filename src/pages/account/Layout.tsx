@@ -10,7 +10,8 @@ export function AccountLayout() {
     { name: "Orders", to: "/account/orders" },
     { name: "Addresses", to: "/account/addresses" },
     { name: "Wishlist", to: "/account/wishlist" },
-    { name: "Settings", to: "/account/settings" },
+    { name: "Cart", to: "/account/cart" },
+    { name: "Profile & Settings", to: "/account/profile" },
   ];
 
   return (
@@ -24,8 +25,8 @@ export function AccountLayout() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Navigation */}
-        <div className="md:w-44 shrink-0">
-          <nav className="space-y-1">
+        <div className="md:w-44 shrink-0 md:border-r pr-1">
+          <nav className="space-y-1 md:text-right">
             {navigation.map((item) => (
               <NavLink
                 key={item.to}

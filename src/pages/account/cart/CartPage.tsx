@@ -11,9 +11,9 @@ import {
   TruckIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth } from "../../contexts/AuthContext";
-import { useCart } from "../../hooks/useCart";
-import { formatAmount } from "../../utils/amount";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useCart } from "../../../hooks/useCart";
+import { formatAmount } from "../../../utils/amount";
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -420,17 +420,6 @@ export function CartPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Related Products */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            You Might Also Like
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {/* You'll need to fetch and display related products here */}
-            {/* This can be implemented with useGetRelatedProductsQuery */}
           </div>
         </div>
       </div>

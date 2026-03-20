@@ -8,18 +8,18 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-
-import { useAuth } from "../../contexts/AuthContext";
 import { Dropdown } from "../headlessUI/Dropdown";
+import { useAppSelector } from "../../store/hooks";
+import { authService } from "../../services/auth";
 
 export function UserMenu() {
-  const { user, logout } = useAuth();
+  const { user } = useAppSelector((s) => s.auth);
   const navigate = useNavigate();
 
   if (!user) {
     return (
       <button
-        onClick={() => navigate("/auth/login")}
+        onClick={() => navigate("/auth/signin")}
         className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         <UserIcon className="w-5 h-5" />
@@ -30,7 +30,7 @@ export function UserMenu() {
 
   const customerMenuItems = [
     {
-      label: "My Profile",
+      label: "My Shop",
       href: "/account",
       icon: <UserIcon className="w-4 h-4" />,
     },
@@ -56,14 +56,13 @@ export function UserMenu() {
     },
     {
       label: "Sign Out",
-      onClick: logout,
+      onClick: () => authService.logout(),
       icon: <ArrowRightOnRectangleIcon className="w-4 h-4" />,
       danger: true,
     },
   ];
 
   const adminMenuItems = [
-    
     {
       label: "Account",
       href: "/admin",
@@ -77,13 +76,15 @@ export function UserMenu() {
     },
     {
       label: "Sign Out",
-      onClick: logout,
+      onClick: () => authService.logout(),
       icon: <ArrowRightOnRectangleIcon className="w-4 h-4" />,
       danger: true,
     },
   ];
 
-  const menuItems = user?.role?.includes('admin') ? adminMenuItems : customerMenuItems;
+  const menuItems = user?.role?.includes("admin")
+    ? adminMenuItems
+    : customerMenuItems;
 
   return (
     <Dropdown

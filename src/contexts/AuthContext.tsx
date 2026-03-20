@@ -2,15 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../configs/firebase";
 import { useAppDispatch } from "../store/hooks";
-import { setUserProfile, clearUserData } from "../store/slices/userSlice";
 import { authService } from "../services/auth.service";
 import {
-  mapFirebaseUser,
   type IAuthContext,
   type IAuthUser,
   type ISignInData,
   type ISignUpData,
 } from "../types/auth.types";
+import type { EUserRole, EUserStatus } from "../types/user.types";
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
@@ -19,29 +18,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<IAuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const dispatch = useAppDispatch(); // Redux dispatch 
+  const dispatch = useAppDispatch(); // Redux dispatch
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      const mappedUser = mapFirebaseUser(firebaseUser);
-      setUser(mappedUser);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Get the ID token result which contains custom claims
+        const idTokenResult = await firebaseUser.getIdTokenResult();
 
-      // Sync with Redux
-      if (mappedUser) {
-        // User logged in - save to Redux
-        dispatch(
-          setUserProfile({
-            uid: mappedUser.uid,
-            email: mappedUser.email || "",
-            displayName: mappedUser.displayName || undefined,
-            photoURL: mappedUser.photoURL || undefined,
-          }),
-        );
+        const mappedUser: IAuthUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          emailVerified: firebaseUser.emailVerified,
+          role: idTokenResult.claims.role as EUserRole,
+          dbId: idTokenResult.claims.dbId as string,
+          status: idTokenResult.claims.status as EUserStatus,
+        };
+
+        setUser(mappedUser);
       } else {
-        // User logged out - clear Redux
-        dispatch(clearUserData());
+        setUser(null);
       }
-
       setLoading(false);
     });
 
@@ -55,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signIn = async (data: ISignInData) => {
-   return await authService.signIn(data);
+    return await authService.signIn(data);
   };
 
   const logout = async () => {

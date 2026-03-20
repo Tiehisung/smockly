@@ -116,15 +116,4 @@ export interface IUserMeta {
     notes?: string;
 }
 
-// Auth Types
-export interface IAuthUser {
-    firebaseUid: string
-    email: string
-    displayName: string
-    photoURL?: string
-
-    role?: EUserRole
-    status?: EUserStatus
-    dbId?: string
-}
-
+ 

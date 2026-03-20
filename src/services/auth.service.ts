@@ -10,23 +10,55 @@ import {
     signInWithPopup,
     signInWithRedirect,
     getRedirectResult,
+
 } from "firebase/auth";
 
 import { mapFirebaseUser, type IAuthUser, type ISignInData, type ISignUpData } from "../types/auth.types";
 import { auth } from "../configs/firebase";
 import { apiService } from "./api.service";
+import type { EUserRole } from "../types/user.types";
 
 class AuthService {
+    // Check if we should use redirect based on environment
+    private shouldUseRedirect(): boolean {
+        // Check if running in iOS Safari
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        // Check if in WebView
+        const isWebView = /(WebView|wv)/i.test(navigator.userAgent);
+
+        // Check if running as PWA
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+        return isIOS || isSafari || isWebView || isPWA;
+    }
+
+
     /** Google Sign In */
-    async signInWithGoogle() {
+    async signInWithGoogle(forceRedirect: boolean = false) {
         try {
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({
                 prompt: 'select_account'
             });
+            // Use redirect if forced or environment suggests it
+            if (forceRedirect || this.shouldUseRedirect()) {
+                // Store the provider in sessionStorage to know what to do after redirect
+                sessionStorage.setItem('auth_provider', 'google');
+                sessionStorage.setItem('auth_action', 'signin');
 
-            const result = await signInWithPopup(auth, provider);
-            return mapFirebaseUser(result.user);
+                await signInWithRedirect(auth, provider);
+                // Note: This will redirect the page, so code after this won't execute
+                return null;
+            } else {
+                // Use popup as default
+                const result = await signInWithPopup(auth, provider);
+                // Update last login in database
+                await this.updateUserLastLogin(result.user.uid);
+                return mapFirebaseUser(result.user);
+            }
+
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -39,6 +71,9 @@ class AuthService {
             provider.addScope('repo');
 
             const result = await signInWithPopup(auth, provider);
+
+            // Update last login in database
+            await this.updateUserLastLogin(result.user.uid);
             return mapFirebaseUser(result.user);
         } catch (error: any) {
             throw new Error(error.message);
@@ -50,7 +85,10 @@ class AuthService {
             ? new GoogleAuthProvider()
             : new GithubAuthProvider();
 
-        await signInWithRedirect(auth, selectedProvider);
+        const result: any = await signInWithRedirect(auth, selectedProvider);
+        console.log('signin with redirect result', result)
+        // Update last login in database
+        await this.updateUserLastLogin(result?.user?.uid);
     }
 
     async getRedirectResult() {
@@ -148,6 +186,78 @@ class AuthService {
         } catch (error) {
             console.error('Error updating last login:', error);
         }
+    }
+
+    /** Send verification email */
+    async sendVerificationEmail(): Promise<void> {
+        try {
+            const user = auth.currentUser;
+            if (!user) {
+                throw new Error('No user logged in');
+            }
+
+            await sendEmailVerification(user, {
+                url: `${window.location.origin}/verify-email-success`,
+                handleCodeInApp: true,
+            });
+
+            console.log('✅ Verification email sent');
+        } catch (error: any) {
+            console.error('❌ Error sending verification email:', error);
+            throw new Error(error.message);
+        }
+    }
+
+    /** Check if email is verified */
+    async isEmailVerified(): Promise<boolean> {
+        const user = auth.currentUser;
+        if (!user) return false;
+
+        // Force refresh to get latest email verification status
+        await user.reload();
+        return user.emailVerified;
+    }
+
+    /** Reload user to get latest email verification status */
+    async reloadUser(): Promise<IAuthUser | null> {
+        const user = auth.currentUser;
+        if (!user) return null;
+
+        await user.reload();
+
+        const mappedUser = mapFirebaseUser(user);
+        if (!mappedUser) return null;
+
+        // Get custom claims
+        try {
+            const idTokenResult = await user.getIdTokenResult(true);
+            return {
+                ...mappedUser,
+                role: idTokenResult.claims.role as EUserRole,
+                dbId: idTokenResult.claims.dbId as string,
+            };
+        } catch (error) {
+            return mappedUser;
+        }
+    }
+
+
+    /** Resend verification email */
+    async resendVerificationEmail(): Promise<void> {
+        return this.sendVerificationEmail();
+    }
+
+    /** Check verification status and redirect if verified */
+    async checkVerificationAndRedirect(returnUrl: string = '/dashboard'): Promise<boolean> {
+        const isVerified = await this.isEmailVerified();
+
+        if (isVerified) {
+            sessionStorage.removeItem('needs_verification');
+            window.location.href = returnUrl;
+            return true;
+        }
+
+        return false;
     }
 }
 

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/auth.service";
 import { GitHubIcon, GoogleIcon } from "../../assets/svg";
 import TextDivider from "../Divider";
 import type { IAuthUser } from "../../types/auth.types";
- 
+import { authService } from "../../services/auth";
 
 interface SocialLoginProps {
   onSuccess?: (user?: IAuthUser | null) => void;
@@ -20,9 +19,6 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
       setLoading("google");
       const user = await authService.signInWithGoogle();
 
-      authService.saveUserToDatabase(user as IAuthUser);
-      authService.updateUserLastLogin(user?.uid as string);
-
       onSuccess?.(user); //optional
       navigate("/admin");
     } catch (error: any) {
@@ -35,12 +31,7 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
   const handleGithubSignIn = async () => {
     try {
       setLoading("github");
-      const user = await authService.signInWithGithub();
 
-      authService.saveUserToDatabase(user as IAuthUser);
-      authService.updateUserLastLogin(user?.uid as string);
-
-      onSuccess?.(user); //optional
       navigate("/admin");
     } catch (error: any) {
       onError?.(error.message);

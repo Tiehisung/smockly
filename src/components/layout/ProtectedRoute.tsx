@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import type { EUserRole } from "../../types/user.types";
 import { LoadingSpinner } from "../common/LoadingSpinner";
+import { useAppSelector } from "../../store/hooks";
 
 interface ProtectedRouteProps {
   redirectTo?: string;
@@ -11,15 +11,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({
-  redirectTo = "/auth/login",
+  redirectTo = "/auth/signin",
   requireVerified,
   fallback = <LoadingSpinner page />,
   requiredRole,
 }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  // const { user, isLoading } = useAuth();
+  const { user, loading } = useAppSelector((s) => s.auth);
 
   // Show loading while checking auth
-  if (isLoading) {
+  if (loading) {
     return fallback;
   }
 
