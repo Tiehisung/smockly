@@ -10,7 +10,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "../headlessUI/Dropdown";
 import { useAppSelector } from "../../store/hooks";
-import { authService } from "../../services/auth";
+import { authService } from "../../services/auth.service";
+import { Button } from "../buttons/Button";
 
 export function UserMenu() {
   const { user } = useAppSelector((s) => s.auth);
@@ -18,13 +19,13 @@ export function UserMenu() {
 
   if (!user) {
     return (
-      <button
+      <Button
         onClick={() => navigate("/auth/signin")}
         className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-        <UserIcon className="w-5 h-5" />
+        <UserIcon className="w-5 h-5 max-sm:hidden" />
         <span>Sign In</span>
-      </button>
+      </Button>
     );
   }
 

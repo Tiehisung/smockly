@@ -11,9 +11,9 @@ import {
   TruckIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth } from "../../../contexts/AuthContext";
 import { useCart } from "../../../hooks/useCart";
 import { formatAmount } from "../../../utils/amount";
+import { useAuth } from "../../../hooks/useAuth";
 
 export function CartPage() {
   const navigate = useNavigate();

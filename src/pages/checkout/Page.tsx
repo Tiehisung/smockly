@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
-import { useAuth } from "../../contexts/AuthContext";
 import { useCart } from "../../hooks/useCart";
 import { CheckoutSteps } from "../../components/checkout/CheckoutSteps";
 import { OrderReview } from "../../components/checkout/OrderReview";
@@ -21,6 +20,7 @@ import type { ICart } from "../../types/cart.types";
 import toast from "react-hot-toast";
 import { useInitializePaystackPaymentMutation } from "../../store/api/ordersApi";
 import { ShippingForm } from "../../components/checkout/ShippinForm";
+import { useAuth } from "../../hooks/useAuth";
 
 export type CheckoutStep = "shipping" | "review" | "confirmation";
 

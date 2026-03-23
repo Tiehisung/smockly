@@ -1,7 +1,7 @@
 // src/pages/OrderConfirmation.tsx
 import { useLocation, Link } from "react-router-dom";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export function OrderConfirmation() {
   const location = useLocation();

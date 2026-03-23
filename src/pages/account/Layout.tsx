@@ -1,9 +1,9 @@
 // src/pages/account/AccountLayout.tsx
 import { Outlet, NavLink } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAppSelector } from "../../store/hooks";
 
 export function AccountLayout() {
-  const { user } = useAuth();
+  const { user } = useAppSelector((s) => s.auth);
 
   const navigation = [
     { name: "Overview", to: "/account", end: true },

@@ -3,10 +3,10 @@ import { useState } from "react";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { useWishlist } from "../../../hooks/useWishlist";
-import { useAuth } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { smartToast } from "../../../lib/toast";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface WishlistButtonProps {
   productId: string;

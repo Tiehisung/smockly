@@ -25,11 +25,7 @@ import { EUserRole } from "../types/user.types";
 
 export const adminRoutes: RouteObject = {
   path: "admin",
-  element: (
-    <ProtectedRoute
-    requiredRole={EUserRole.ADMIN}
-    />
-  ),
+  element: <ProtectedRoute requiredRole={EUserRole.ADMIN} />,
   children: [
     {
       element: <AdminLayout />,

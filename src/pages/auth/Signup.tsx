@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authService } from "../../services/auth";
+import { authService } from "../../services/auth.service";
 import { INPUT } from "../../components/input/Input";
 import { Button } from "../../components/buttons/Button";
 
@@ -34,7 +34,6 @@ export function SignupPage() {
       console.log(newuser);
 
       navigate("/admin");
-      
     } catch (error: any) {
       setError(error.message);
       console.log({ error });
@@ -117,7 +116,7 @@ export function SignupPage() {
 
           <div className="text-center">
             <Link
-              to="/auth/login"
+              to="/auth/signin"
               className="text-sm text-blue-600 hover:text-blue-800"
             >
               Already have an account? Sign in

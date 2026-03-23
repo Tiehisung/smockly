@@ -1,7 +1,5 @@
 import { auth } from "../configs/firebase";
 
-
-
 interface ApiResponse<T> {
     success: boolean;
     data?: T;

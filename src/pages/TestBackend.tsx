@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiService } from "../services/api.service";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+ 
 
 export function TestBackend() {
   const { user } = useAuth();

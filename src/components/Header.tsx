@@ -11,7 +11,7 @@ import { useWishlist } from "../hooks/useWishlist";
 
 export function Header() {
   const { itemCount } = useCart();
-   const { itemCount:wishItemCount } = useWishlist();
+  const { itemCount: wishItemCount } = useWishlist();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
@@ -21,7 +21,7 @@ export function Header() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="text-2xl font-bold text-blue-600">
-              GH Smockly
+              Smockly
             </Link>
 
             {/* Navigation */}
@@ -42,7 +42,6 @@ export function Header() {
               >
                 New Arrivals
               </Link>
-             
             </div>
 
             {/* Icons */}

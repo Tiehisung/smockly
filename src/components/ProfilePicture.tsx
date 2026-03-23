@@ -2,7 +2,8 @@ import { useState, useRef } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile, type User } from "firebase/auth";
 import { storage } from "../configs/firebase";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+ 
 
 export function ProfilePicture() {
   const { user } = useAuth();

@@ -9,6 +9,7 @@ export interface IAuthUser {
     role?: EUserRole;
     status?: EUserStatus;
     dbId?: string
+    provider?: 'google' | 'facebook' | 'email';
 }
 
 export interface ISignUpData {
@@ -35,7 +36,10 @@ export interface IUpdatePasswordData {
     newPassword: string;
     confirmPassword: string;
 }
-
+export interface IRedirectResult {
+    user: IAuthUser | null;
+    returnUrl: string;
+}
 export interface IAuthContext {
     user: IAuthUser | null;
     dbUser: IUser | null;
@@ -86,7 +90,12 @@ export const mapFirebaseUser = (firebaseUser: any): IAuthUser | null => {
             console.error('Failed to decode token', e);
         }
     }
-
+    let provider: 'google' | 'facebook' | 'email' = 'email';
+    if (firebaseUser.providerData?.length > 0) {
+        const providerId = firebaseUser.providerData[0]?.providerId;
+        if (providerId === 'google.com') provider = 'google';
+        else if (providerId === 'facebook.com') provider = 'facebook';
+    }
     return {
         uid: firebaseUser.uid,
         email: firebaseUser.email || null,
@@ -95,6 +104,7 @@ export const mapFirebaseUser = (firebaseUser: any): IAuthUser | null => {
         emailVerified: firebaseUser.emailVerified || false,
         role,
         dbId,
-        status
+        status,
+        provider
     };
 };

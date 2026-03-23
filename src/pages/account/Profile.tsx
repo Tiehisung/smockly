@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "../../contexts/AuthContext";
 import {
   UserIcon,
   BellIcon,
@@ -16,6 +15,7 @@ import { CHECKBOX } from "../../components/input/Checkbox";
 import { Button } from "../../components/buttons/Button";
 import { Tabs } from "../../components/tabs";
 import { useUpdateUserProfileMutation } from "../../store/api/user.api";
+import { useAuth } from "../../hooks/useAuth";
 
 const profileSchema = z.object({
   displayName: z

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
-import { useAuth } from "../../contexts/AuthContext";
 import { SocialLogin } from "../../components/auth/SocialLogin";
-import { authService } from "../../services/auth";
+import { authService } from "../../services/auth.service";
 
 export function SignInPage() {
   const [email, setEmail] = useState("");

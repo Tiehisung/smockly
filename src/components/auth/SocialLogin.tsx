@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GitHubIcon, GoogleIcon } from "../../assets/svg";
 import TextDivider from "../Divider";
 import type { IAuthUser } from "../../types/auth.types";
-import { authService } from "../../services/auth";
+import { authService } from "../../services/auth.service";
 
 interface SocialLoginProps {
   onSuccess?: (user?: IAuthUser | null) => void;
@@ -17,9 +17,9 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
   const handleGoogleSignIn = async () => {
     try {
       setLoading("google");
-      const user = await authService.signInWithGoogle();
+     await authService.signInWithGoogle();
 
-      onSuccess?.(user); //optional
+      onSuccess?.(null); //optional
       navigate("/admin");
     } catch (error: any) {
       onError?.(error.message);

@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import type { EUserRole } from "../../types/user.types";
 import { LoadingSpinner } from "../common/LoadingSpinner";
-import { useAppSelector } from "../../store/hooks";
+import { useAuth } from "../../hooks/useAuth";
 
 interface ProtectedRouteProps {
   redirectTo?: string;
@@ -16,8 +16,8 @@ export function ProtectedRoute({
   fallback = <LoadingSpinner page />,
   requiredRole,
 }: ProtectedRouteProps) {
-  // const { user, isLoading } = useAuth();
-  const { user, loading } = useAppSelector((s) => s.auth);
+ 
+   const { user, isAuthenticated, loading } = useAuth();
 
   // Show loading while checking auth
   if (loading) {
@@ -25,12 +25,24 @@ export function ProtectedRoute({
   }
 
   // Redirect if not logged in
-  if (!user) {
-    return <Navigate to={redirectTo} replace />;
+  if (!isAuthenticated || !user) {
+    return (
+      <Navigate
+        to={redirectTo}
+        state={{ from: window.location.pathname }}
+        replace
+      />
+    );
   }
   // Redirect to verification page if email not verified
   if (requireVerified && !user.emailVerified) {
-    return <Navigate to="/auth/verify-email" replace />;
+    return (
+      <Navigate
+        to="/auth/verify-email"
+        state={{ from: window.location.pathname }}
+        replace
+      />
+    );
   }
 
   if (requiredRole && !requiredRole.includes(user?.role as string)) {

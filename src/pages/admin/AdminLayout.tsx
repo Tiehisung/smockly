@@ -14,7 +14,6 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { LogOut, User } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../../components/buttons/Button";
 import { AVATAR } from "../../components/ui/avatar";
 import { getInitials } from "../../lib";

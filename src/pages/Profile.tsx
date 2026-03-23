@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useState } from "react"; 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { setUserPreferences } from "../store/slices/userSlice";
 import { ProfilePicture } from "../components/ProfilePicture";
 import { DeleteAccount } from "../components/auth/DeleteAccount";
+import { useAuth } from "../hooks/useAuth";
 
 export function Profile() {
   const { user, logout,   } = useAuth();

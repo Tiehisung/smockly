@@ -1,159 +1,160 @@
+// src/services/auth.service.ts
 import {
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
     signOut,
-    updateProfile,
-    type UserCredential,
-    GoogleAuthProvider,
-    GithubAuthProvider,
-    signInWithPopup,
     signInWithRedirect,
+    type UserCredential,
+    sendEmailVerification,
+    updateProfile,
     getRedirectResult,
-
+    onAuthStateChanged,
 } from "firebase/auth";
-
-import { mapFirebaseUser, type IAuthUser, type ISignInData, type ISignUpData } from "../types/auth.types";
-import { auth } from "../configs/firebase";
+import { auth, facebookProvider, googleProvider } from "../configs/firebase";
+import { mapFirebaseUser, type IAuthUser, type IRedirectResult } from "../types/auth.types";
 import { apiService } from "./api.service";
-import type { EUserRole } from "../types/user.types";
+import type { EUserRole, EUserStatus } from "../types/user.types";
+import { store } from "../store/store";
+import { clearUser, } from "../store/slices/auth.slice";
 
 class AuthService {
-    // Check if we should use redirect based on environment
-    private shouldUseRedirect(): boolean {
-        // Check if running in iOS Safari
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // Helper: Get user with custom claims
+    private async enrichUser(firebaseUser: any): Promise<IAuthUser | null> {
+        if (!firebaseUser) return null;
 
-        // Check if in WebView
-        const isWebView = /(WebView|wv)/i.test(navigator.userAgent);
+        // First map to serializable user object
+        const mappedUser = mapFirebaseUser(firebaseUser);
+        if (!mappedUser) return null;
 
-        // Check if running as PWA
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches;
-
-        return isIOS || isSafari || isWebView || isPWA;
+        try {
+            const tokenResult = await firebaseUser.getIdTokenResult();
+            return {
+                ...mappedUser,  // Only spread the mapped user (serializable)
+                role: tokenResult.claims.role as EUserRole,
+                status: tokenResult.claims.status as EUserStatus,
+                dbId: tokenResult.claims.dbId as string,
+            };
+        } catch {
+            return mappedUser;
+        }
     }
 
+    // Google Sign In
+    async signInWithGoogle(returnUrl: string = '/shop'): Promise<void> {
+        // Store return URL for after redirect
+        sessionStorage.setItem('auth_return_url', returnUrl);
+        sessionStorage.setItem('auth_provider', 'google');
 
-    /** Google Sign In */
-    async signInWithGoogle(forceRedirect: boolean = false) {
-        try {
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({
-                prompt: 'select_account'
-            });
-            // Use redirect if forced or environment suggests it
-            if (forceRedirect || this.shouldUseRedirect()) {
-                // Store the provider in sessionStorage to know what to do after redirect
-                sessionStorage.setItem('auth_provider', 'google');
-                sessionStorage.setItem('auth_action', 'signin');
+        await signInWithRedirect(auth, googleProvider);
+    }
 
-                await signInWithRedirect(auth, provider);
-                // Note: This will redirect the page, so code after this won't execute
-                return null;
+    // Facebook Sign In
+    async signInWithFacebook(returnUrl: string = '/shop'): Promise<void> {
+        // Store return URL for after redirect
+        sessionStorage.setItem('auth_return_url', returnUrl);
+        sessionStorage.setItem('auth_provider', 'facebook');
+
+        await signInWithRedirect(auth, facebookProvider);
+    }
+
+    // Listen to auth state changes
+    onAuthStateChanged(callback: (user: IAuthUser | null) => void): () => void {
+        return onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                const enrichedUser = await this.enrichUser(firebaseUser);
+                callback(enrichedUser);
             } else {
-                // Use popup as default
-                const result = await signInWithPopup(auth, provider);
-                // Update last login in database
-                await this.updateUserLastLogin(result.user.uid);
-                return mapFirebaseUser(result.user);
+                callback(null);
             }
-
-        } catch (error: any) {
-            throw new Error(error.message);
-        }
+        });
     }
 
-    // GitHub Sign In
-    async signInWithGithub() {
-        try {
-            const provider = new GithubAuthProvider();
-            provider.addScope('repo');
 
-            const result = await signInWithPopup(auth, provider);
-
-            // Update last login in database
-            await this.updateUserLastLogin(result.user.uid);
-            return mapFirebaseUser(result.user);
-        } catch (error: any) {
-            throw new Error(error.message);
-        }
-    }
-    // For mobile or when popup is blocked
-    async signInWithRedirect(provider: 'google' | 'github') {
-        const selectedProvider = provider === 'google'
-            ? new GoogleAuthProvider()
-            : new GithubAuthProvider();
-
-        const result: any = await signInWithRedirect(auth, selectedProvider);
-        console.log('signin with redirect result', result)
-        // Update last login in database
-        await this.updateUserLastLogin(result?.user?.uid);
-    }
-
-    async getRedirectResult() {
+    // Handle Redirect Result
+    async handleRedirectResult(): Promise<IRedirectResult> {
+        console.log('🔍 handleRedirectResult called');
         try {
             const result = await getRedirectResult(auth);
-            return result ? mapFirebaseUser(result.user) : null;
-        } catch (error: any) {
-            throw new Error(error.message);
-        }
-    }
 
-    /**Credentials Signup*/
-    async signUp({ email, password, displayName }: ISignUpData): Promise<IAuthUser> {
-        try {
-            const userCredential: UserCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
+            const returnUrl = sessionStorage.getItem('auth_return_url') || '/shop';
 
-            // Update profile with display name
-            if (displayName && userCredential.user) {
-                await updateProfile(userCredential.user, { displayName });
+            if (result?.user) {
+                const provider = sessionStorage.getItem('auth_provider');
+                console.log(`${provider} sign-in successful:`, result.user.email);
+
+                // Clear stored data
+                sessionStorage.removeItem('auth_return_url');
+                sessionStorage.removeItem('auth_provider');
+
+                const enrichedUser = await this.enrichUser(result.user);
+
+                if (enrichedUser) {
+                    // Check if new user
+                    const isNewUser = result.operationType === 'signIn';
+
+                    if (isNewUser) {
+                        await this.saveUserToDatabase(enrichedUser);
+                    }
+
+                    await this.updateUserLastLogin(result.user.uid);
+                }
+
+                return { user: enrichedUser, returnUrl };
             }
-            // Send verification email
-            await sendEmailVerification(userCredential.user);
-            console.log('Verification email sent!');
 
-            const mappedUser = mapFirebaseUser(userCredential.user);
-            if (!mappedUser) throw new Error('Failed to create user');
-
-            // Call backend to save user to MongoDB
-            await this.saveUserToDatabase(mappedUser);
-            return mappedUser;
-        } catch (error: any) {
-            throw new Error(error.message);
+            return { user: null, returnUrl };
+        } catch (error) {
+            console.error('Redirect error:', error);
+            sessionStorage.removeItem('auth_return_url');
+            sessionStorage.removeItem('auth_provider');
+            throw error;
         }
     }
 
-    async signIn({ email, password }: ISignInData): Promise<IAuthUser> {
-        try {
-            const userCredential: UserCredential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
+    async getCurrentUser(): Promise<IAuthUser | null> {
+        const user = auth.currentUser;
+        if (!user) return null;
+        return this.enrichUser(user);
+    }
+    // Email/Password Sign In
 
-            const mappedUser = mapFirebaseUser(userCredential.user);
-            if (!mappedUser) throw new Error('Failed to sign in');
+    async signIn(email: string, password: string) {
+        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
 
-            // Update last login in database
-            await this.updateUserLastLogin(mappedUser.uid);
-
-            return mappedUser;
-        } catch (error: any) {
-            throw new Error(error.message);
+        const enrichedUser = await this.enrichUser(userCredential.user);
+        if (enrichedUser) {
+            await this.saveUserToDatabase(enrichedUser);
+            await this.updateUserLastLogin(enrichedUser?.uid);
         }
+
+        return enrichedUser!;
     }
 
-    async logout(): Promise<void> {
+    // Email/Password Sign Up
+
+    async signUp(email: string, password: string, displayName?: string) {
+        const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+        if (displayName && userCredential.user) {
+            await updateProfile(userCredential.user, { displayName });
+        }
+
+        // Send verification email
+        await sendEmailVerification(userCredential.user);
+
+        const enrichedUser = await this.enrichUser(userCredential.user);
+        if (enrichedUser) {
+            await this.saveUserToDatabase(enrichedUser);
+        }
+
+        return enrichedUser!;
+    }
+
+    // Logout
+
+    async logout() {
         await signOut(auth);
-    }
-
-    getCurrentUser(): IAuthUser | null {
-        return mapFirebaseUser(auth.currentUser);
+        store.dispatch(clearUser())
     }
 
     // Save user to MongoDB
@@ -201,7 +202,6 @@ class AuthService {
                 handleCodeInApp: true,
             });
 
-            console.log('✅ Verification email sent');
         } catch (error: any) {
             console.error('❌ Error sending verification email:', error);
             throw new Error(error.message);
@@ -225,20 +225,10 @@ class AuthService {
 
         await user.reload();
 
-        const mappedUser = mapFirebaseUser(user);
-        if (!mappedUser) return null;
+        const enrichedUser = await this.enrichUser(user);
+        if (!enrichedUser) return null;
 
-        // Get custom claims
-        try {
-            const idTokenResult = await user.getIdTokenResult(true);
-            return {
-                ...mappedUser,
-                role: idTokenResult.claims.role as EUserRole,
-                dbId: idTokenResult.claims.dbId as string,
-            };
-        } catch (error) {
-            return mappedUser;
-        }
+        return enrichedUser;
     }
 
 
@@ -248,7 +238,7 @@ class AuthService {
     }
 
     /** Check verification status and redirect if verified */
-    async checkVerificationAndRedirect(returnUrl: string = '/dashboard'): Promise<boolean> {
+    async checkVerificationAndRedirect(returnUrl: string = '/'): Promise<boolean> {
         const isVerified = await this.isEmailVerified();
 
         if (isVerified) {
@@ -259,6 +249,9 @@ class AuthService {
 
         return false;
     }
+
+
 }
 
 export const authService = new AuthService();
+

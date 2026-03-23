@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+ 
 import { apiService } from "../../services/api.service";
+import { useAuth } from "../../hooks/useAuth";
 
 export function DeleteAccount() {
   const { logout } = useAuth();

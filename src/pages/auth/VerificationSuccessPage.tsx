@@ -1,7 +1,7 @@
 // pages/VerificationSuccessPage.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/auth";
+import { authService } from "../../services/auth.service";
 
 export const VerificationSuccessPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const VerificationSuccessPage: React.FC = () => {
           setCountdown((prev) => {
             if (prev <= 1) {
               clearInterval(timer);
-              navigate("/dashboard");
+              navigate("/");
               return 0;
             }
             return prev - 1;
@@ -59,15 +59,15 @@ export const VerificationSuccessPage: React.FC = () => {
           </h2>
 
           <p className="text-gray-600 mb-4">
-            Your email has been verified. You'll be redirected to the dashboard
-            in {countdown} seconds.
+            Your email has been verified. You'll be redirected in {countdown}{" "}
+            seconds.
           </p>
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/")}
             className="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Go to Dashboard Now
+            Go to Home Now
           </button>
         </div>
       </div>

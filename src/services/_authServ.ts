@@ -1,0 +1,264 @@
+// import {
+//     createUserWithEmailAndPassword,
+//     sendEmailVerification,
+//     signInWithEmailAndPassword,
+//     signOut,
+//     updateProfile,
+//     type UserCredential,
+//     GoogleAuthProvider,
+//     GithubAuthProvider,
+//     signInWithPopup,
+//     signInWithRedirect,
+//     getRedirectResult,
+
+// } from "firebase/auth";
+
+// import { mapFirebaseUser, type IAuthUser, type ISignInData, type ISignUpData } from "../types/auth.types";
+// import { auth } from "../configs/firebase";
+// import { apiService } from "./api.service";
+// import type { EUserRole } from "../types/user.types";
+
+// class AuthService {
+//     // Check if we should use redirect based on environment
+//     private shouldUseRedirect(): boolean {
+//         // Check if running in iOS Safari
+//         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+//         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+//         // Check if in WebView
+//         const isWebView = /(WebView|wv)/i.test(navigator.userAgent);
+
+//         // Check if running as PWA
+//         const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+//         return isIOS || isSafari || isWebView || isPWA;
+//     }
+
+
+//     /** Google Sign In */
+//     async signInWithGoogle(forceRedirect: boolean = false) {
+//         try {
+//             const provider = new GoogleAuthProvider();
+//             provider.setCustomParameters({
+//                 prompt: 'select_account'
+//             });
+//             // Use redirect if forced or environment suggests it
+//             if (forceRedirect || this.shouldUseRedirect()) {
+//                 // Store the provider in sessionStorage to know what to do after redirect
+//                 sessionStorage.setItem('auth_provider', 'google');
+//                 sessionStorage.setItem('auth_action', 'signin');
+
+//                 await signInWithRedirect(auth, provider);
+//                 // Note: This will redirect the page, so code after this won't execute
+//                 return null;
+//             } else {
+//                 // Use popup as default
+//                 const result = await signInWithPopup(auth, provider);
+//                 // Update last login in database
+//                 await this.updateUserLastLogin(result.user.uid);
+//                 return mapFirebaseUser(result.user);
+//             }
+
+//         } catch (error: any) {
+//             throw new Error(error.message);
+//         }
+//     }
+
+//     // GitHub Sign In
+//     async signInWithGithub() {
+//         try {
+//             const provider = new GithubAuthProvider();
+//             provider.addScope('repo');
+
+//             const result = await signInWithPopup(auth, provider);
+
+//             // Update last login in database
+//             await this.updateUserLastLogin(result.user.uid);
+//             return mapFirebaseUser(result.user);
+//         } catch (error: any) {
+//             throw new Error(error.message);
+//         }
+//     }
+//     // For mobile or when popup is blocked
+//     async signInWithRedirect(provider: 'google' | 'github') {
+//         const selectedProvider = provider === 'google'
+//             ? new GoogleAuthProvider()
+//             : new GithubAuthProvider();
+
+//         const result: any = await signInWithRedirect(auth, selectedProvider);
+//         console.log('signin with redirect result', result)
+//         // Update last login in database
+//         await this.updateUserLastLogin(result?.user?.uid);
+//     }
+
+//     async getRedirectResult() {
+//         try {
+//             const result = await getRedirectResult(auth);
+//             return result ? mapFirebaseUser(result.user) : null;
+//         } catch (error: any) {
+//             throw new Error(error.message);
+//         }
+//     }
+
+//     /**Credentials Signup*/
+//     async signUp({ email, password, displayName }: ISignUpData): Promise<IAuthUser> {
+//         try {
+//             const userCredential: UserCredential = await createUserWithEmailAndPassword(
+//                 auth,
+//                 email,
+//                 password
+//             );
+
+//             // Update profile with display name
+//             if (displayName && userCredential.user) {
+//                 await updateProfile(userCredential.user, { displayName });
+//             }
+//             // Send verification email
+//             await sendEmailVerification(userCredential.user);
+//             console.log('Verification email sent!');
+
+//             const mappedUser = mapFirebaseUser(userCredential.user);
+//             if (!mappedUser) throw new Error('Failed to create user');
+
+//             // Call backend to save user to MongoDB
+//             await this.saveUserToDatabase(mappedUser);
+//             return mappedUser;
+//         } catch (error: any) {
+//             throw new Error(error.message);
+//         }
+//     }
+
+//     async signIn({ email, password }: ISignInData): Promise<IAuthUser> {
+//         try {
+//             const userCredential: UserCredential = await signInWithEmailAndPassword(
+//                 auth,
+//                 email,
+//                 password
+//             );
+
+//             const mappedUser = mapFirebaseUser(userCredential.user);
+//             if (!mappedUser) throw new Error('Failed to sign in');
+
+//             // Update last login in database
+//             await this.updateUserLastLogin(mappedUser.uid);
+
+//             return mappedUser;
+//         } catch (error: any) {
+//             throw new Error(error.message);
+//         }
+//     }
+
+//     async logout(): Promise<void> {
+//         await signOut(auth);
+//     }
+
+//     getCurrentUser(): IAuthUser | null {
+//         return mapFirebaseUser(auth.currentUser);
+//     }
+
+//     // Save user to MongoDB
+//     async saveUserToDatabase(user: IAuthUser): Promise<void> {
+//         try {
+//             console.log('saving')
+//             const response = await apiService.post('/users/create', {
+//                 firebaseUid: user.uid,
+//                 email: user.email,
+//                 displayName: user.displayName,
+//                 photoURL: user.photoURL
+//             });
+
+//             if (!response.success) {
+//                 console.error('Failed to save user to database:', response.error);
+//             } else {
+//                 console.log('✅ User saved to MongoDB');
+//             }
+//         } catch (error) {
+//             console.error('Error saving user to database:', error);
+//             // Don't throw - we don't want to block the user if DB save fails
+//             // They'll be created when they first access their profile
+//         }
+//     }
+
+//     // Update last login
+//     async updateUserLastLogin(uid: string): Promise<void> {
+//         try {
+//             await apiService.post('/users/last-login', { uid });
+//         } catch (error) {
+//             console.error('Error updating last login:', error);
+//         }
+//     }
+
+//     /** Send verification email */
+//     async sendVerificationEmail(): Promise<void> {
+//         try {
+//             const user = auth.currentUser;
+//             if (!user) {
+//                 throw new Error('No user logged in');
+//             }
+
+//             await sendEmailVerification(user, {
+//                 url: `${window.location.origin}/verify-email-success`,
+//                 handleCodeInApp: true,
+//             });
+
+//             console.log('✅ Verification email sent');
+//         } catch (error: any) {
+//             console.error('❌ Error sending verification email:', error);
+//             throw new Error(error.message);
+//         }
+//     }
+
+//     /** Check if email is verified */
+//     async isEmailVerified(): Promise<boolean> {
+//         const user = auth.currentUser;
+//         if (!user) return false;
+
+//         // Force refresh to get latest email verification status
+//         await user.reload();
+//         return user.emailVerified;
+//     }
+
+//     /** Reload user to get latest email verification status */
+//     async reloadUser(): Promise<IAuthUser | null> {
+//         const user = auth.currentUser;
+//         if (!user) return null;
+
+//         await user.reload();
+
+//         const mappedUser = mapFirebaseUser(user);
+//         if (!mappedUser) return null;
+
+//         // Get custom claims
+//         try {
+//             const idTokenResult = await user.getIdTokenResult(true);
+//             return {
+//                 ...mappedUser,
+//                 role: idTokenResult.claims.role as EUserRole,
+//                 dbId: idTokenResult.claims.dbId as string,
+//             };
+//         } catch (error) {
+//             return mappedUser;
+//         }
+//     }
+
+
+//     /** Resend verification email */
+//     async resendVerificationEmail(): Promise<void> {
+//         return this.sendVerificationEmail();
+//     }
+
+//     /** Check verification status and redirect if verified */
+//     async checkVerificationAndRedirect(returnUrl: string = '/dashboard'): Promise<boolean> {
+//         const isVerified = await this.isEmailVerified();
+
+//         if (isVerified) {
+//             sessionStorage.removeItem('needs_verification');
+//             window.location.href = returnUrl;
+//             return true;
+//         }
+
+//         return false;
+//     }
+// }
+
+// export const authService = new AuthService();

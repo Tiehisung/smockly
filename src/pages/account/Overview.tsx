@@ -1,6 +1,5 @@
 // src/pages/account/AccountOverview.tsx
 import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import { useGetUserOrdersQuery } from "../../store/api/ordersApi";
 import { useGetWishlistQuery } from "../../store/api/wishlistApi";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
@@ -19,6 +18,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { formatAmount } from "../../utils/amount";
 import { useGetUserStatsQuery } from "../../store/api/user.api";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AccountOverview() {
   const { user } = useAuth();

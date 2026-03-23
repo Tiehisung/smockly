@@ -14,7 +14,7 @@ import { baseApi } from './api/baseApi';
 const persistConfig = {
     key: 'root', // key in localStorage
     storage, // using localStorage
-    whitelist: ['user', 'app', 'cart'], // reducers you want to persist
+    whitelist: ['auth', 'user', 'app', 'cart'], // reducers you want to persist
     blacklist: [baseApi.reducerPath] // Don't persist API cache
 };
 

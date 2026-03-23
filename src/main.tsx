@@ -1,11 +1,12 @@
+// main.tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./store/store";
+ 
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -14,9 +15,7 @@ createRoot(document.getElementById("root")!).render(
         loading={<div>Loading saved data...</div>}
         persistor={persistor}
       >
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <App />
       </PersistGate>
     </Provider>
   </StrictMode>,

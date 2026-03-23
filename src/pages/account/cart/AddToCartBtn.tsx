@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { useCart } from "../../../hooks/useCart";
 import { ShoppingBagIcon, CheckIcon } from "@heroicons/react/24/outline";
-import { useAuth } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import type { IProduct, IProductVariant } from "../../../types/product.types";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface AddToCartButtonProps {
   product: IProduct;

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/auth.service";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export function VerifyEmailPage() {
   const { user } = useAuth();
@@ -43,7 +43,7 @@ export function VerifyEmailPage() {
       try {
         const isVerified = await authService.isEmailVerified();
         if (isVerified) {
-          navigate("/dashboard");
+          navigate("/");
         }
       } catch (error) {
         console.error("Error checking verification:", error);
@@ -77,7 +77,7 @@ export function VerifyEmailPage() {
       setCheckingVerification(true);
       const isVerified = await authService.isEmailVerified();
       if (isVerified) {
-        navigate("/dashboard");
+        navigate("/");
       } else {
         setError("Email not verified yet. Please check your inbox.");
       }
